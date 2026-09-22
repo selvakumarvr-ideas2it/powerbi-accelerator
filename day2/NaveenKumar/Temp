@@ -1,1 +1,13 @@
 
+Staging_PO_2026_01 row count	80
+Staging_PO_2026_02 row count	80
+Staging_PO_2026_03 row count	80	
+Staging_PO_Combined (appended)	240	
+Staging_ERP_PurchaseOrders_Reference	240	
+Staging_WMS_Inventory (source)	300	
+PO_Final (after Supplier + Shipments merge)	240
+Inventory_Final (after Warehouse + Product merge)	300	
+PO_Final → Supplier_Status "Unmatched Supplier" count	matches S999 occurrences in raw PO data	
+Inventory_Final → Warehouse_Status "Unmatched Warehouse" count	—	27	
+Inventory_Final → Inventory_Value_Check "Mismatch" count	0	
+Inventory_Final → Unit_Cost_Check "Mismatch" count	0 

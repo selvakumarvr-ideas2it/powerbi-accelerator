@@ -1,0 +1,8 @@
+Stage	Row Count	Change	Explanation
+Claims_Jan (source)	160	—	Raw January claims file
+Claims_Feb (source)	160	—	Raw February claims file
+Appended total	320	160 + 160	Combined via Table.Combine
+After DUPLICATE Claim_ID removal	312	−8	8 rows with placeholder Claim_ID = "DUPLICATE" removed per task 7 instruction
+Final Claims_Combined	312	0	No further rows lost — Member_ID, Provider_ID, Diagnosis_Category, and Net_Claim_Cost issues were all handled by flagging, not deletion
+Claims_Exceptions (flagged subset)	144	—	Rows with ≥1 data-quality issue: Missing Diagnosis, Invalid Member, Invalid Provider, or Allowed > Billed
+Valid Claims (312 − 144)	168	—	Rows passing all four checks cleanly

@@ -1,2 +1,1 @@
-**Claude-Assisted BI Development**
-AI-assisted DAX, SQL→DAX, SQL→M, requirement analysis, UX review, AI validation, Develop a Claude Skill
+Legacy Migration - MicroStrategy / Cognos Legacy inventory, metric mapping, prompts/filters, DAX recreation, reconciliation, gaps/risks

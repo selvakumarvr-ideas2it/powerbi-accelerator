@@ -1,0 +1,261 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/powerbi-desktop-samples/main/Report%20Theme%20JSON%20Schema/reportThemeSchema-2.157.json",
+  "name": "Calibri Universal Theme",
+  
+  "dataColors": [
+    "#0B9B7A",
+    "#0A2540",
+    "#34BFA3",
+    "#59D2FE",
+    "#E28743",
+    "#4A90E2",
+    "#1C3D5A",
+    "#9B51E0"
+  ],
+  
+  "background": "#F4F7F6",
+  "foreground": "#0A2540",
+  "tableAccent": "#0B9B7A",
+  "good": "#0B9B7A",
+  "neutral": "#E28743",
+  "bad": "#D9534F",
+  "maximum": "#0B9B7A",
+  "center": "#59D2FE",
+  "minimum": "#E1E8ED",
+
+  "textClasses": {
+    "callout": {
+      "fontFace": "Calibri",
+      "fontSize": 28,
+      "color": "#0A2540"
+    },
+    "title": {
+      "fontFace": "Calibri",
+      "fontSize": 14,
+      "color": "#0A2540"
+    },
+    "header": {
+      "fontFace": "Calibri",
+      "fontSize": 12,
+      "color": "#0A2540"
+    },
+    "label": {
+      "fontFace": "Calibri",
+      "fontSize": 10,
+      "color": "#5A6B82"
+    }
+  },
+
+  "visualStyles": {
+    "*": {
+      "*": {
+        "outspacePane": [
+          {
+            "backgroundColor": { "solid": { "color": "#F4F7F6" } }
+          }
+        ],
+        "background": [
+          {
+            "show": true,
+            "color": { "solid": { "color": "#FFFFFF" } },
+            "transparency": 0
+          }
+        ],
+        "border": [
+          {
+            "show": true,
+            "color": { "solid": { "color": "#E1E8ED" } },
+            "radius": 8
+          }
+        ],
+        "dropShadow": [
+          {
+            "show": false
+          }
+        ],
+        "title": [
+          {
+            "show": true,
+            "fontColor": { "solid": { "color": "#0A2540" } },
+            "fontFamily": "Calibri",
+            "fontSize": 14,
+            "alignment": "left"
+          }
+        ],
+        "valueAxis": [
+          {
+            "gridlineColor": { "solid": { "color": "#E1E8ED" } },
+            "gridlineStyle": "solid",
+            "labelColor": { "solid": { "color": "#5A6B82" } },
+            "titleColor": { "solid": { "color": "#5A6B82" } },
+            "fontFamily": "Calibri",
+            "fontSize": 9
+          }
+        ],
+        "categoryAxis": [
+          {
+            "labelColor": { "solid": { "color": "#5A6B82" } },
+            "titleColor": { "solid": { "color": "#5A6B82" } },
+            "gridlineShow": false,
+            "fontFamily": "Calibri",
+            "fontSize": 9
+          }
+        ],
+        "legend": [
+          {
+            "show": true,
+            "labelColor": { "solid": { "color": "#5A6B82" } },
+            "position": "Top",
+            "fontFamily": "Calibri",
+            "fontSize": 10
+          }
+        ],
+        "labels": [
+          {
+            "show": true,
+            "color": { "solid": { "color": "#0A2540" } },
+            "fontFamily": "Calibri",
+            "fontSize": 9
+          }
+        ]
+      }
+    },
+
+    "page": {
+      "*": {
+        "background": [
+          {
+            "color": { "solid": { "color": "#F4F7F6" } },
+            "transparency": 0
+          }
+        ],
+        "outspace": [
+          {
+            "color": { "solid": { "color": "#F4F7F6" } },
+            "transparency": 0
+          }
+        ]
+      }
+    },
+
+    "card": {
+      "*": {
+        "labels": [
+          {
+            "color": { "solid": { "color": "#0A2540" } },
+            "fontSize": 28,
+            "fontFamily": "Calibri"
+          }
+        ],
+        "categoryLabels": [
+          {
+            "show": true,
+            "color": { "solid": { "color": "#5A6B82" } },
+            "fontSize": 10,
+            "fontFamily": "Calibri"
+          }
+        ]
+      }
+    },
+
+    "slicer": {
+      "*": {
+        "header": [
+          {
+            "show": true,
+            "fontColor": { "solid": { "color": "#0A2540" } },
+            "textSize": 11,
+            "fontFamily": "Calibri"
+          }
+        ],
+        "items": [
+          {
+            "fontColor": { "solid": { "color": "#0A2540" } },
+            "background": { "solid": { "color": "#FFFFFF" } },
+            "fontFamily": "Calibri",
+            "textSize": 10
+          }
+        ]
+      }
+    },
+
+    "tableEx": {
+      "*": {
+        "columnHeaders": [
+          {
+            "fontColor": { "solid": { "color": "#0A2540" } },
+            "backColor": { "solid": { "color": "#E6F4F1" } },
+            "fontFamily": "Calibri",
+            "fontSize": 10
+          }
+        ],
+        "values": [
+          {
+            "fontColorPrimary": { "solid": { "color": "#0A2540" } },
+            "backColorPrimary": { "solid": { "color": "#FFFFFF" } },
+            "fontColorSecondary": { "solid": { "color": "#0A2540" } },
+            "backColorSecondary": { "solid": { "color": "#F4F7F6" } },
+            "fontFamily": "Calibri",
+            "fontSize": 9
+          }
+        ],
+        "grid": [
+          {
+            "gridVertical": false,
+            "gridHorizontal": true,
+            "outlineColor": { "solid": { "color": "#E1E8ED" } }
+          }
+        ]
+      }
+    },
+
+    "pivotTable": {
+      "*": {
+        "columnHeaders": [
+          {
+            "fontColor": { "solid": { "color": "#0A2540" } },
+            "backColor": { "solid": { "color": "#E6F4F1" } },
+            "fontFamily": "Calibri",
+            "fontSize": 10
+          }
+        ],
+        "rowHeaders": [
+          {
+            "fontColor": { "solid": { "color": "#0A2540" } },
+            "fontFamily": "Calibri",
+            "fontSize": 10
+          }
+        ],
+        "values": [
+          {
+            "fontColorPrimary": { "solid": { "color": "#0A2540" } },
+            "backColorPrimary": { "solid": { "color": "#FFFFFF" } },
+            "fontColorSecondary": { "solid": { "color": "#0A2540" } },
+            "backColorSecondary": { "solid": { "color": "#F4F7F6" } },
+            "fontFamily": "Calibri",
+            "fontSize": 9
+          }
+        ]
+      }
+    },
+
+    "actionButton": {
+      "*": {
+        "fill": [
+          {
+            "show": true,
+            "fillColor": { "solid": { "color": "#0B9B7A" } }
+          }
+        ],
+        "text": [
+          {
+            "show": true,
+            "fontColor": { "solid": { "color": "#FFFFFF" } },
+            "fontFamily": "Calibri",
+            "fontSize": 10
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,155 @@
+table DimDate
+	lineageTag: cab7ead6-2e7d-40a7-9c5a-cf214a61c779
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isUnique
+		formatString: dd-mmm-yyyy
+		lineageTag: 500dc114-cb64-42f7-a69d-037175bd8942
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 3fe1b87b-be54-45e4-ad05-1dc7462b0950
+		summarizeBy: none
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		dataType: string
+		lineageTag: 5b8774c4-f1ad-4afc-b27e-7ab941225c8d
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthNumber
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 53c798b1-d519-441b-ae1b-a20337cecd12
+		summarizeBy: none
+		sourceColumn: MonthNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: string
+		lineageTag: e542e4eb-4578-4b7d-886b-26d336fa429f
+		summarizeBy: none
+		sourceColumn: Month
+		sortByColumn: MonthNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column YearMonth
+		dataType: string
+		formatString: Long Date
+		lineageTag: 12515f8a-bc6e-4c01-aead-6d913bfc2b2e
+		summarizeBy: none
+		sourceColumn: YearMonth
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Week
+		dataType: int64
+		formatString: 0
+		lineageTag: 3678acd8-7c08-4222-a34d-ea73ca7bf117
+		summarizeBy: none
+		sourceColumn: Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column DayOfWeek
+		dataType: string
+		lineageTag: b684e953-adc8-4812-921b-7c7049a8b66e
+		summarizeBy: none
+		sourceColumn: DayOfWeek
+		sortByColumn: DayOfWeekNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Year'
+		dataType: string
+		lineageTag: 919469b4-8956-4f5d-9da1-cf8536eadbfc
+		summarizeBy: none
+		sourceColumn: Month Year
+		sortByColumn: YearMonthKey
+
+	column YearMonthKey
+		dataType: int64
+		isHidden
+		lineageTag: 59289d0a-7da0-4569-b068-8e22e43aa9cb
+		summarizeBy: none
+		sourceColumn: YearMonthKey
+
+	column 'Year Quarter'
+		dataType: string
+		lineageTag: da5c3f95-7c22-47bb-a394-83ac28b827de
+		summarizeBy: none
+		sourceColumn: Year Quarter
+		sortByColumn: YearQuarterKey
+
+	column YearQuarterKey
+		dataType: int64
+		isHidden
+		lineageTag: 2d5ad910-4d64-47e5-8b62-5717357ae5ec
+		summarizeBy: none
+		sourceColumn: YearQuarterKey
+
+	column DayOfWeekNumber
+		dataType: int64
+		isHidden
+		lineageTag: e97b779b-2f24-4f35-8b3e-e7d808052505
+		summarizeBy: none
+		sourceColumn: DayOfWeekNumber
+
+	column 'Day Type'
+		dataType: string
+		lineageTag: e9e6f8b0-e830-4b11-9254-864e62d5a857
+		summarizeBy: none
+		sourceColumn: Day Type
+
+	hierarchy 'Date Hierarchy'
+		lineageTag: 25b8fd07-4528-4d57-b112-2589e5ca8fbd
+
+		level Year
+			lineageTag: 82dd4488-3ec9-4fb0-ad18-459c8f95d994
+			column: Year
+
+		level Quarter
+			lineageTag: 1eb5ec79-9d09-4417-ba8e-1dfad0aeaf9a
+			column: Quarter
+
+		level Month
+			lineageTag: d05cdb35-60e6-4db8-b324-fe7f204e09bb
+			column: Month
+
+	partition DimDate = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DimDate.csv"), [Delimiter=",", Columns=8, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"Date", type date}, {"Year", Int64.Type}, {"Quarter", type text}, {"MonthNumber", Int64.Type}, {"Month", type text}, {"YearMonth", type text}, {"Week", Int64.Type}, {"DayOfWeek", type text}}, "en-US"),
+				    MonthYear = Table.AddColumn(Typed, "Month Year", each [Month] & " " & Text.From([Year]), type text),
+				    YearMonthKey = Table.AddColumn(MonthYear, "YearMonthKey", each [Year] * 100 + [MonthNumber], Int64.Type),
+				    YearQuarter = Table.AddColumn(YearMonthKey, "Year Quarter", each Text.From([Year]) & " " & [Quarter], type text),
+				    YearQuarterKey = Table.AddColumn(YearQuarter, "YearQuarterKey", each [Year] * 10 + Number.RoundUp([MonthNumber] / 3), Int64.Type),
+				    DayNum = Table.AddColumn(YearQuarterKey, "DayOfWeekNumber", each Date.DayOfWeek([Date], Day.Monday) + 1, Int64.Type),
+				    DayType = Table.AddColumn(DayNum, "Day Type", each if [DayOfWeekNumber] >= 6 then "Weekend" else "Weekday", type text)
+				in
+				    DayType
+
+	annotation PBI_ResultType = Table
+

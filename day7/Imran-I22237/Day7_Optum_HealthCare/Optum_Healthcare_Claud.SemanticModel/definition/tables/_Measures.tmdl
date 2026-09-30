@@ -1,0 +1,314 @@
+/// Home table for all report measures
+table _Measures
+	lineageTag: 2b81965d-66d2-4bd8-b2ad-fd87dedb3bb9
+
+	/// Paid claims only (ClaimStatus = Paid). Denied/Pending excluded by design.
+	measure 'Total Claims Cost' = CALCULATE ( SUM ( FactClaims[ClaimCost] ), KEEPFILTERS ( FactClaims[ClaimStatus] = "Paid" ) )
+		formatString: \$#,0.00
+		displayFolder: 1 Cost
+		lineageTag: bcd742fc-0a23-4cb7-a4a0-1929e4acb700
+
+	measure 'Allowed Amount (Paid)' = CALCULATE ( SUM ( FactClaims[AllowedAmount] ), KEEPFILTERS ( FactClaims[ClaimStatus] = "Paid" ) )
+		formatString: \$#,0.00
+		displayFolder: 1 Cost
+		lineageTag: 0c37eb67-490f-4b53-b570-d0a369030daa
+
+	measure 'Paid to Allowed %' = DIVIDE ( [Total Claims Cost], [Allowed Amount (Paid)] )
+		formatString: 0%
+		displayFolder: 1 Cost
+		lineageTag: 2194ed58-dbc9-45ba-a79c-686dd577b649
+
+	/// Paid claims cost / paid claim count
+	measure 'Avg Claim Cost' = DIVIDE ( [Total Claims Cost], [Paid Claim Count] )
+		formatString: \$#,0.00
+		displayFolder: 1 Cost
+		lineageTag: 733e90d8-c707-422e-af0d-dace336cd080
+
+	/// Paid claims cost / members with claims. Use on provider/member pages where PMPM (payer-level) cannot filter.
+	measure 'Cost per Member' = DIVIDE ( [Total Claims Cost], [Member Count] )
+		formatString: \$#,0.00
+		displayFolder: 1 Cost
+		lineageTag: a1ecf750-0350-49be-b178-fb23ae25c028
+
+	measure 'Cost Share %' = DIVIDE ( [Total Claims Cost], CALCULATE ( [Total Claims Cost], ALLSELECTED () ) )
+		formatString: 0%
+		displayFolder: 1 Cost
+		lineageTag: cba9316e-9619-4012-bb43-3f37a9279760
+
+	/// All claims (Paid + Denied + Pending)
+	measure 'Claim Count' = COUNTROWS ( FactClaims )
+		formatString: #,0
+		displayFolder: 2 Utilization
+		lineageTag: 34c61631-2de5-4a63-bf76-14bace7eff50
+
+	measure 'Paid Claim Count' = CALCULATE ( COUNTROWS ( FactClaims ), KEEPFILTERS ( FactClaims[ClaimStatus] = "Paid" ) )
+		formatString: #,0
+		displayFolder: 2 Utilization
+		lineageTag: ae878a29-25fe-4477-849b-8049a535115c
+
+	measure 'Denied Claim Count' = CALCULATE ( COUNTROWS ( FactClaims ), KEEPFILTERS ( FactClaims[ClaimStatus] = "Denied" ) )
+		formatString: #,0
+		displayFolder: 2 Utilization
+		lineageTag: 64c972e0-61d8-4a73-939a-c42030a0868a
+
+	measure 'Denial Rate' = DIVIDE ( [Denied Claim Count], [Claim Count] )
+		formatString: 0%
+		displayFolder: 2 Utilization
+		lineageTag: 57438547-acd8-4ea7-b9eb-960338091fc2
+
+	/// Distinct members with at least one claim
+	measure 'Member Count' = DISTINCTCOUNT ( FactClaims[MemberKey] )
+		formatString: #,0
+		displayFolder: 2 Utilization
+		lineageTag: b5644373-e2f0-47e1-91ae-4288c8652d43
+
+	measure 'Claims per Member' = DIVIDE ( [Claim Count], [Member Count] )
+		formatString: #,0.0
+		displayFolder: 2 Utilization
+		lineageTag: 32c0b8f8-6d59-478b-adaf-1a28787e211e
+
+	measure 'Inpatient Claims' = CALCULATE ( COUNTROWS ( FactClaims ), KEEPFILTERS ( FactClaims[ServiceType] = "Inpatient" ) )
+		formatString: #,0
+		displayFolder: 2 Utilization
+		lineageTag: 5578ef28-7e47-4720-a07d-6c6fd7e2e4e4
+
+	/// Average length of stay, inpatient claims only
+	measure 'Avg LOS (Inpatient)' = CALCULATE ( AVERAGE ( FactClaims[LengthOfStay] ), KEEPFILTERS ( FactClaims[ServiceType] = "Inpatient" ) )
+		formatString: #,0.0
+		displayFolder: 2 Utilization
+		lineageTag: 8529ad07-f654-4802-92c0-cd21d9cd1b4d
+
+	/// Premium revenue. Filters by Date, Payer, LOB only.
+	measure Revenue = SUM ( FactRevenue[Revenue] )
+		formatString: \$#,0.00
+		displayFolder: 3 Finance
+		lineageTag: ac3e8b13-0650-491b-afdd-34a55d5a71b4
+
+	/// Booked medical cost from FactRevenue. Filters by Date, Payer, LOB only.
+	measure 'Medical Cost' = SUM ( FactRevenue[MedicalCost] )
+		formatString: \$#,0.00
+		displayFolder: 3 Finance
+		lineageTag: d2b4a49c-cf89-43e6-a40b-5597fe83091d
+
+	measure 'Member Months' = SUM ( FactRevenue[MemberCount] )
+		formatString: #,0
+		displayFolder: 3 Finance
+		lineageTag: 54bae562-3fca-4cf7-8c2d-1560a42f5c15
+
+	/// Medical cost per member per month = Medical Cost / Member Months
+	measure PMPM = DIVIDE ( [Medical Cost], [Member Months] )
+		formatString: \$#,0.00
+		displayFolder: 3 Finance
+		lineageTag: c1425e4e-736d-4daf-aaa5-9f9d06b889e0
+
+	measure 'Revenue PMPM' = DIVIDE ( [Revenue], [Member Months] )
+		formatString: \$#,0.00
+		displayFolder: 3 Finance
+		lineageTag: a25e99ab-779a-4829-8f9c-d6a63542059e
+
+	/// MCR = Medical Cost / Revenue (FactRevenue)
+	measure 'Medical Cost Ratio' = DIVIDE ( [Medical Cost], [Revenue] )
+		formatString: 0%
+		displayFolder: 3 Finance
+		lineageTag: 2586a17b-eace-4d3b-a9be-a00633e20b23
+
+	/// Planning target, adjustable
+	measure 'MCR Target' = 0.85
+		formatString: 0%
+		displayFolder: 3 Finance
+		lineageTag: ea196622-e9e3-46a7-ac86-00f563bfd20f
+
+	measure Margin = [Revenue] - [Medical Cost]
+		formatString: \$#,0.00
+		displayFolder: 3 Finance
+		lineageTag: 8ff1cfda-a414-499d-a476-258e5541de8d
+
+	measure 'Total Claims Cost PY' = CALCULATE ( [Total Claims Cost], SAMEPERIODLASTYEAR ( DimDate[Date] ) )
+		formatString: \$#,0.00
+		displayFolder: 4 Time Intelligence
+		lineageTag: e89eb850-6cc0-4268-92e2-e3d31b16ca1a
+
+	/// Paid claims cost vs same period last year. Blank when no prior-year data (2025).
+	measure 'YoY Cost Growth %' = IF ( HASONEVALUE ( DimDate[Year] ), VAR cy = [Total Claims Cost] VAR py = [Total Claims Cost PY] RETURN IF ( NOT ISBLANK ( py ), DIVIDE ( cy - py, py ) ) )
+		formatString: +0%;-0%;0%
+		displayFolder: 4 Time Intelligence
+		lineageTag: b15c310b-6498-4aef-828a-fcc0bda21507
+
+	measure 'Claim Count YoY %' = IF ( HASONEVALUE ( DimDate[Year] ), VAR py = CALCULATE ( [Claim Count], SAMEPERIODLASTYEAR ( DimDate[Date] ) ) RETURN IF ( NOT ISBLANK ( py ), DIVIDE ( [Claim Count] - py, py ) ) )
+		formatString: +0%;-0%;0%
+		displayFolder: 4 Time Intelligence
+		lineageTag: 625a54f1-8613-445f-8228-6171746cfa79
+
+	measure 'Member Count YoY %' = IF ( HASONEVALUE ( DimDate[Year] ), VAR py = CALCULATE ( [Member Count], SAMEPERIODLASTYEAR ( DimDate[Date] ) ) RETURN IF ( NOT ISBLANK ( py ), DIVIDE ( [Member Count] - py, py ) ) )
+		formatString: +0%;-0%;0%
+		displayFolder: 4 Time Intelligence
+		lineageTag: 67ef4004-ff86-4b1f-ad1a-1af31ad0272a
+
+	measure 'PMPM YoY %' = IF ( HASONEVALUE ( DimDate[Year] ), VAR py = CALCULATE ( [PMPM], SAMEPERIODLASTYEAR ( DimDate[Date] ) ) RETURN IF ( NOT ISBLANK ( py ), DIVIDE ( [PMPM] - py, py ) ) )
+		formatString: +0%;-0%;0%
+		displayFolder: 4 Time Intelligence
+		lineageTag: e2bbe70a-40c3-4ac2-9025-d297c6d32816
+
+	measure 'Avg Claim Cost YoY %' = IF ( HASONEVALUE ( DimDate[Year] ), VAR py = CALCULATE ( [Avg Claim Cost], SAMEPERIODLASTYEAR ( DimDate[Date] ) ) RETURN IF ( NOT ISBLANK ( py ), DIVIDE ( [Avg Claim Cost] - py, py ) ) )
+		formatString: +0%;-0%;0%
+		displayFolder: 4 Time Intelligence
+		lineageTag: 205d1be6-4d8b-49a8-94a7-266ad20a3ee9
+
+	measure 'Revenue YoY %' = IF ( HASONEVALUE ( DimDate[Year] ), VAR py = CALCULATE ( [Revenue], SAMEPERIODLASTYEAR ( DimDate[Date] ) ) RETURN IF ( NOT ISBLANK ( py ), DIVIDE ( [Revenue] - py, py ) ) )
+		formatString: +0%;-0%;0%
+		displayFolder: 4 Time Intelligence
+		lineageTag: add16bcc-951b-468a-a760-814d7207bce3
+
+	/// Change in MCR vs prior year, in percentage points
+	measure 'MCR YoY pts' = IF ( HASONEVALUE ( DimDate[Year] ), VAR py = CALCULATE ( [Medical Cost Ratio], SAMEPERIODLASTYEAR ( DimDate[Date] ) ) RETURN IF ( NOT ISBLANK ( py ), [Medical Cost Ratio] - py ) )
+		formatString: +0%;-0%;0%
+		displayFolder: 4 Time Intelligence
+		lineageTag: 1050ff93-83bf-43e9-9baf-9284013c9370
+
+	measure 'Cost YoY Label' = VAR p = [YoY Cost Growth %] RETURN IF ( NOT HASONEVALUE ( DimDate[Year] ), "Select one year for YoY", IF ( ISBLANK ( p ), "No prior year", IF ( p >= 0, "▲ ", "▼ " ) & FORMAT ( ABS ( p ), "0%" ) & " vs PY" ) )
+		displayFolder: 5 KPI Labels
+		lineageTag: 8240a3c1-eaf5-4bca-b31e-a48a051295ef
+
+	measure 'Claims YoY Label' = VAR p = [Claim Count YoY %] RETURN IF ( NOT HASONEVALUE ( DimDate[Year] ), "Select one year for YoY", IF ( ISBLANK ( p ), "No prior year", IF ( p >= 0, "▲ ", "▼ " ) & FORMAT ( ABS ( p ), "0%" ) & " vs PY" ) )
+		displayFolder: 5 KPI Labels
+		lineageTag: f3b2b831-5003-4832-8385-a41f2d613d93
+
+	measure 'Members YoY Label' = VAR p = [Member Count YoY %] RETURN IF ( NOT HASONEVALUE ( DimDate[Year] ), "Select one year for YoY", IF ( ISBLANK ( p ), "No prior year", IF ( p >= 0, "▲ ", "▼ " ) & FORMAT ( ABS ( p ), "0%" ) & " vs PY" ) )
+		displayFolder: 5 KPI Labels
+		lineageTag: 05ffc7ee-4c98-4575-91d0-830bf37b6a19
+
+	measure 'PMPM YoY Label' = VAR p = [PMPM YoY %] RETURN IF ( NOT HASONEVALUE ( DimDate[Year] ), "Select one year for YoY", IF ( ISBLANK ( p ), "No prior year", IF ( p >= 0, "▲ ", "▼ " ) & FORMAT ( ABS ( p ), "0%" ) & " vs PY" ) )
+		displayFolder: 5 KPI Labels
+		lineageTag: b881dbe6-e7a6-4204-b52f-12eb9e175bda
+
+	measure 'Avg Claim YoY Label' = VAR p = [Avg Claim Cost YoY %] RETURN IF ( NOT HASONEVALUE ( DimDate[Year] ), "Select one year for YoY", IF ( ISBLANK ( p ), "No prior year", IF ( p >= 0, "▲ ", "▼ " ) & FORMAT ( ABS ( p ), "0%" ) & " vs PY" ) )
+		displayFolder: 5 KPI Labels
+		lineageTag: aba72a79-ded1-4570-8f8d-a1c67c3caaf0
+
+	measure 'Revenue YoY Label' = VAR p = [Revenue YoY %] RETURN IF ( NOT HASONEVALUE ( DimDate[Year] ), "Select one year for YoY", IF ( ISBLANK ( p ), "No prior year", IF ( p >= 0, "▲ ", "▼ " ) & FORMAT ( ABS ( p ), "0%" ) & " vs PY" ) )
+		displayFolder: 5 KPI Labels
+		lineageTag: c068a572-eee6-4e2b-ac85-18faa30629de
+
+	measure 'MCR YoY Label' = VAR p = [MCR YoY pts] RETURN IF ( NOT HASONEVALUE ( DimDate[Year] ), "Select one year for YoY", IF ( ISBLANK ( p ), "No prior year", IF ( p >= 0, "▲ ", "▼ " ) & FORMAT ( ABS ( p ) * 100, "0" ) & " pts vs PY" ) )
+		displayFolder: 5 KPI Labels
+		lineageTag: 3457f9ef-9fd0-45d0-8236-4627a3f7a8c7
+
+	/// Cost-type metric: increase = unfavourable (red)
+	measure 'Cost YoY Color' = VAR p = [YoY Cost Growth %] RETURN SWITCH ( TRUE (), ISBLANK ( p ), "#73716A", p > 0, "#D71515", "#066605" )
+		displayFolder: 5 KPI Labels
+		lineageTag: 329d0da7-1875-4230-977f-50e6ffb38fda
+
+	measure 'PMPM YoY Color' = VAR p = [PMPM YoY %] RETURN SWITCH ( TRUE (), ISBLANK ( p ), "#73716A", p > 0, "#D71515", "#066605" )
+		displayFolder: 5 KPI Labels
+		lineageTag: d40ca28b-0834-427f-8cd5-c01d6b02dc87
+
+	measure 'Avg Claim YoY Color' = VAR p = [Avg Claim Cost YoY %] RETURN SWITCH ( TRUE (), ISBLANK ( p ), "#73716A", p > 0, "#D71515", "#066605" )
+		displayFolder: 5 KPI Labels
+		lineageTag: ef59b40f-268c-4cb5-9a8e-b85c0390337d
+
+	measure 'MCR YoY Color' = VAR p = [MCR YoY pts] RETURN SWITCH ( TRUE (), ISBLANK ( p ), "#73716A", p > 0, "#D71515", "#066605" )
+		displayFolder: 5 KPI Labels
+		lineageTag: 97729c30-b799-414c-bcbf-f19d4e0b3cf1
+
+	/// Revenue/volume metric: increase = favourable (green)
+	measure 'Revenue YoY Color' = VAR p = [Revenue YoY %] RETURN SWITCH ( TRUE (), ISBLANK ( p ), "#73716A", p >= 0, "#066605", "#D71515" )
+		displayFolder: 5 KPI Labels
+		lineageTag: af8a3bcf-0e76-4b38-8be1-a6dda39dda4e
+
+	measure 'MCR Status Color' = IF ( [Medical Cost Ratio] > [MCR Target], "#D71515", "#066605" )
+		displayFolder: 5 KPI Labels
+		lineageTag: 0c79fae1-bd45-451a-9dd7-b3f0fe8f4a53
+
+	measure 'Selected LOB' = VAR n = COUNTROWS ( VALUES ( DimPayer[LOB] ) ) RETURN SWITCH ( TRUE (), NOT ISFILTERED ( DimPayer[LOB] ), "All LOBs", n <= 2, CONCATENATEX ( VALUES ( DimPayer[LOB] ), DimPayer[LOB], ", ", DimPayer[LOB] ), n & " LOBs" )
+		displayFolder: 6 Titles
+		lineageTag: 21d73777-36ea-4bf7-91af-f0773298d149
+
+	measure 'Selected Payer' = VAR n = COUNTROWS ( VALUES ( DimPayer[PayerName] ) ) RETURN SWITCH ( TRUE (), NOT ISFILTERED ( DimPayer[PayerName] ), "All Payers", n <= 2, CONCATENATEX ( VALUES ( DimPayer[PayerName] ), DimPayer[PayerName], ", ", DimPayer[PayerName] ), n & " Payers" )
+		displayFolder: 6 Titles
+		lineageTag: 644acbd5-986b-46fd-ba2d-3d08c682dfe9
+
+	/// Provider region
+	measure 'Selected Region' = VAR n = COUNTROWS ( VALUES ( DimProvider[Region] ) ) RETURN SWITCH ( TRUE (), NOT ISFILTERED ( DimProvider[Region] ), "All Regions", n <= 2, CONCATENATEX ( VALUES ( DimProvider[Region] ), DimProvider[Region], ", ", DimProvider[Region] ), n & " Regions" )
+		displayFolder: 6 Titles
+		lineageTag: 2c91ba81-1f02-4fa0-887d-56dddc6bc9af
+
+	measure 'Selected Specialty' = VAR n = COUNTROWS ( VALUES ( DimProvider[Specialty] ) ) RETURN SWITCH ( TRUE (), NOT ISFILTERED ( DimProvider[Specialty] ), "All Specialties", n <= 2, CONCATENATEX ( VALUES ( DimProvider[Specialty] ), DimProvider[Specialty], ", ", DimProvider[Specialty] ), n & " Specialties" )
+		displayFolder: 6 Titles
+		lineageTag: 1b1c18a7-b617-4b68-884c-6bf0d51d611f
+
+	measure 'Selected Period' = VAR mn = MIN ( DimDate[Date] ) VAR mx = MAX ( DimDate[Date] ) RETURN IF ( ISFILTERED ( DimDate ), FORMAT ( mn, "MMM yyyy" ) & " – " & FORMAT ( mx, "MMM yyyy" ), "Jan 2025 – Dec 2026" )
+		displayFolder: 6 Titles
+		lineageTag: 1a3c1993-e5b1-44b6-af2f-672945c12b8f
+
+	measure 'Title Executive' = "Payor Executive Overview  |  " & [Selected LOB] & "  ·  " & [Selected Payer] & "  ·  " & [Selected Region] & "  ·  " & [Selected Period]
+		displayFolder: 6 Titles
+		lineageTag: 3079b9e8-d910-4b84-82ab-7600801870f4
+
+	measure 'Title Provider' = "Provider / LOB Analysis  |  " & [Selected LOB] & "  ·  " & [Selected Payer] & "  ·  " & [Selected Region] & "  ·  " & [Selected Specialty]
+		displayFolder: 6 Titles
+		lineageTag: 26ab900d-6325-4b10-993e-ff8a8a1f7bd9
+
+	measure 'Title Detail' = "Member / Claim Detail  |  " & SELECTEDVALUE ( DimProvider[ProviderName], "All Providers" ) & "  ·  " & [Selected LOB] & "  ·  " & [Selected Region]
+		displayFolder: 6 Titles
+		lineageTag: 0910eb28-94df-498c-b30f-f6fb2f9a29ba
+
+	measure 'Trend Title Cost' = "Paid Claims Cost vs Revenue  —  " & [Selected LOB]
+		displayFolder: 6 Titles
+		lineageTag: 60a7673c-d1e4-46cf-9343-79034d90f561
+
+	measure 'Trend Title Utilization' = "Claim Volume & Denial Rate  —  " & [Selected LOB]
+		displayFolder: 6 Titles
+		lineageTag: 437668e7-c7eb-4519-b6c8-1c121bc34a78
+
+	measure 'Data Through' = "Data through " & FORMAT ( CALCULATE ( MAX ( FactClaims[Date] ), REMOVEFILTERS () ), "dd MMM yyyy" )
+		displayFolder: 6 Titles
+		lineageTag: 068f20b0-3c90-4414-a056-3258a562ffd7
+
+	measure 'Provider Cost Rank' = IF ( HASONEVALUE ( DimProvider[ProviderName] ), RANKX ( ALLSELECTED ( DimProvider ), [Total Claims Cost], , DESC, DENSE ) )
+		formatString: #,0
+		displayFolder: 7 Helpers
+		lineageTag: 507af4fc-5fc8-4ea9-ad2a-31ec3b51a8ed
+
+	measure 'Top Service Type' = MAXX ( TOPN ( 1, VALUES ( FactClaims[ServiceType] ), [Total Claims Cost], DESC ), FactClaims[ServiceType] )
+		displayFolder: 7 Helpers
+		lineageTag: 60a54549-bdda-418d-808a-118a7cfdf022
+
+	measure 'Top Provider' = MAXX ( TOPN ( 1, VALUES ( DimProvider[ProviderName] ), [Total Claims Cost], DESC ), DimProvider[ProviderName] )
+		displayFolder: 7 Helpers
+		lineageTag: 3c155897-c91a-48f9-b1b9-5774dd99f1e5
+
+	measure 'Revenue Filter Note' = IF ( ISFILTERED ( DimProvider ) || ISFILTERED ( DimMember ) || ISFILTERED ( FactClaims[ServiceType] ), "⚠ Revenue, MCR & PMPM ignore Provider / Region / Specialty / Member filters (revenue is payer-level)", "" )
+		displayFolder: 7 Helpers
+		lineageTag: 78ed3cc9-41a8-437d-8e6d-08fba66512fd
+
+	measure 'PY Cost Label' = VAR py = [Total Claims Cost PY] RETURN IF ( NOT HASONEVALUE ( DimDate[Year] ), "Select one year for PY", IF ( ISBLANK ( py ), "No prior year", "PY " & FORMAT ( py, "$#,0.00" ) ) )
+		displayFolder: 5 KPI Labels
+		lineageTag: 8f23373a-dbe9-4d37-a646-362fddd50d21
+
+	measure 'Denial Rate Label' = "Denial rate " & FORMAT ( [Denial Rate], "0%" )
+		displayFolder: 5 KPI Labels
+		lineageTag: b144b474-8fac-44d9-8ecf-5da574821dc6
+
+	measure 'Members Label' = FORMAT ( [Claims per Member], "0.0" ) & " claims / member"
+		displayFolder: 5 KPI Labels
+		lineageTag: c1826015-9182-4c22-97b3-539c460068e8
+
+	measure 'MCR vs Target Label' = "Target " & FORMAT ( [MCR Target], "0%" )
+		displayFolder: 5 KPI Labels
+		lineageTag: cacab489-1127-4b5a-8ec9-dc019fb0d7b8
+
+	/// Text version of YoY Cost Growth % for the KPI tile: shows an em dash instead of (Blank) when no single year is selected.
+	measure 'YoY Cost Growth Display' = VAR p = [YoY Cost Growth %] RETURN IF ( ISBLANK ( p ), "—", FORMAT ( p, "+0%;-0%;0%" ) )
+		displayFolder: 5 KPI Labels
+		lineageTag: f32e8ab8-9c61-4e98-99c5-e7fbfa48afa7
+
+	column _
+		isHidden
+		lineageTag: 3c1f616e-680d-4781-88a2-8d0fa1cd389b
+		isNameInferred
+		sourceColumn: [_]
+
+	partition _Measures = calculated
+		mode: import
+		source = ROW("_", BLANK())
+

@@ -1,0 +1,78 @@
+table FactRevenue
+	lineageTag: b51d5e60-a219-4df6-b748-022abbac80e5
+
+	column RevenueKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0ad510f5-ee2e-4ec9-abc4-1185302edcad
+		summarizeBy: none
+		sourceColumn: RevenueKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 590a280d-1087-4fd4-990a-6a346e81ea0b
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column PayerKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 93ccbb4d-212d-44fd-aa84-6559d309ea82
+		summarizeBy: none
+		sourceColumn: PayerKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column MemberCount
+		dataType: int64
+		formatString: 0
+		lineageTag: e8a0a90e-be22-4349-a4e3-aa465b7e0c77
+		summarizeBy: none
+		sourceColumn: MemberCount
+
+		annotation SummarizationSetBy = Automatic
+
+	column Revenue
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: d8595336-1d7e-4367-a872-86c39e869aee
+		summarizeBy: sum
+		sourceColumn: Revenue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column MedicalCost
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 1774c195-cd6e-4d3b-a72c-b38a94dfaaef
+		summarizeBy: sum
+		sourceColumn: MedicalCost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition FactRevenue = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "FactRevenue.csv"), [Delimiter=",", Columns=6, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"RevenueKey", Int64.Type}, {"Date", type date}, {"PayerKey", Int64.Type}, {"MemberCount", Int64.Type}, {"Revenue", Currency.Type}, {"MedicalCost", Currency.Type}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

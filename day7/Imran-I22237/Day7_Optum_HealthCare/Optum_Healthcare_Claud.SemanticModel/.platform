@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Optum_Healthcare_Claud"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "990289f6-b44d-443f-8ada-71c83b7a85dc"
+  }
+}

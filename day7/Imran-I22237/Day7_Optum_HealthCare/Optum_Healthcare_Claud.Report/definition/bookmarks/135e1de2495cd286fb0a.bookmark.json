@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
+  "displayName": "Reset Filters",
+  "name": "135e1de2495cd286fb0a",
+  "options": {
+    "suppressActiveSection": true,
+    "suppressDisplay": true
+  },
+  "explorationState": {
+    "version": "1.0",
+    "activeSection": "45291b0a8050333c676a",
+    "sections": {
+      "45291b0a8050333c676a": {
+        "visualContainers": {}
+      }
+    }
+  }
+}

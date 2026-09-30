@@ -1,0 +1,4 @@
+/// Folder containing the Day 7 CSV files (must end with a backslash)
+expression DataFolder = "C:\Users\naveenkumar\Documents\Powerbi\Data\Day_7_Optum_Data\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 2c240cf3-3583-4f33-bdca-0f2b27940e76
+

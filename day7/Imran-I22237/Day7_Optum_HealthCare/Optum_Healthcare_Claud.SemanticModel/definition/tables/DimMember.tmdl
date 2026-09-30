@@ -1,0 +1,69 @@
+table DimMember
+	lineageTag: 77767b4d-5a14-48d7-850a-8e4086ed3774
+
+	column MemberKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 25e47350-5379-4e7d-b42e-0c7705987557
+		summarizeBy: none
+		sourceColumn: MemberKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column MemberID
+		dataType: string
+		lineageTag: fe10c716-250d-4d1a-b2c8-c5aabb830862
+		summarizeBy: none
+		sourceColumn: MemberID
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Member enrolment LOB. Does NOT match payer LOB on ~75% of claims - use DimPayer[LOB] for reporting.
+	column LOB
+		dataType: string
+		lineageTag: b9f27374-31f8-4bfe-b84b-2e7a50bf2db4
+		summarizeBy: none
+		sourceColumn: LOB
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Member region. Report 'Region' slicer uses DimProvider[Region].
+	column Region
+		dataType: string
+		lineageTag: d107f7a4-ed04-4843-bfe0-d6520ad4fa95
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column AgeBand
+		dataType: string
+		lineageTag: 1dffe566-38d7-4b96-97f8-a88cb9cff915
+		summarizeBy: none
+		sourceColumn: AgeBand
+		sortByColumn: 'AgeBand Sort'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'AgeBand Sort'
+		dataType: int64
+		isHidden
+		lineageTag: bda5eb2e-5542-4457-86c1-dddf3eb5bf3a
+		summarizeBy: none
+		sourceColumn: AgeBand Sort
+
+	partition DimMember = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DimMember.csv"), [Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"MemberKey", Int64.Type}, {"MemberID", type text}, {"LOB", type text}, {"Region", type text}, {"AgeBand", type text}}, "en-US"),
+				    Trimmed = Table.TransformColumns(Typed, {{"MemberID", Text.Trim, type text}, {"LOB", Text.Trim, type text}, {"Region", Text.Trim, type text}, {"AgeBand", Text.Trim, type text}}),
+				    AgeSort = Table.AddColumn(Trimmed, "AgeBand Sort", each try Number.From(Text.BeforeDelimiter(Text.Replace([AgeBand], "+", ""), "-")) otherwise 0, Int64.Type)
+				in
+				    AgeSort
+
+	annotation PBI_ResultType = Table
+

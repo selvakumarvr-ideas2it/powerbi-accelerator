@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
+  "displayName": "Utilization View",
+  "name": "d947d553c03b5367245c",
+  "options": {
+    "targetVisualNames": [
+      "b7988015c465434efdd1",
+      "1acc3f1e02e3cc870d89"
+    ],
+    "suppressActiveSection": true,
+    "suppressData": true
+  },
+  "explorationState": {
+    "version": "1.0",
+    "activeSection": "45291b0a8050333c676a",
+    "sections": {
+      "45291b0a8050333c676a": {
+        "visualContainers": {
+          "b7988015c465434efdd1": {
+            "singleVisual": {
+              "visualType": "clusteredColumnChart",
+              "objects": {}
+            }
+          },
+          "1acc3f1e02e3cc870d89": {
+            "singleVisual": {
+              "visualType": "lineClusteredColumnComboChart",
+              "objects": {},
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

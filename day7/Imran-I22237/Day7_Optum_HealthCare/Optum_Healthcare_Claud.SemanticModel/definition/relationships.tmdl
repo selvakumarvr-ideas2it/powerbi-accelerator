@@ -1,0 +1,24 @@
+relationship AutoDetected_c200a624-3375-43ad-9ad4-41f947d7ac76
+	fromColumn: FactClaims.MemberKey
+	toColumn: DimMember.MemberKey
+
+relationship AutoDetected_86fcbfee-f957-4d9a-a5cf-6ed12aa5cb22
+	fromColumn: FactClaims.PayerKey
+	toColumn: DimPayer.PayerKey
+
+relationship AutoDetected_e9999131-e030-4895-84ee-99ec7c82f3cf
+	fromColumn: FactClaims.ProviderKey
+	toColumn: DimProvider.ProviderKey
+
+relationship AutoDetected_b88dabc8-9975-4810-89ce-b6f9581fe71a
+	fromColumn: FactRevenue.PayerKey
+	toColumn: DimPayer.PayerKey
+
+relationship FactClaims_Date_DimDate_Date
+	fromColumn: FactClaims.Date
+	toColumn: DimDate.Date
+
+relationship FactRevenue_Date_DimDate_Date
+	fromColumn: FactRevenue.Date
+	toColumn: DimDate.Date
+

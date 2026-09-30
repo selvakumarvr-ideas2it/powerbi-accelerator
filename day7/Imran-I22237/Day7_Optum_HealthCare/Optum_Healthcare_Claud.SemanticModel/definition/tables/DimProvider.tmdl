@@ -1,0 +1,58 @@
+table DimProvider
+	lineageTag: ca6ac33d-9721-442b-9a34-c8fc3ca8dd5c
+
+	column ProviderKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 7223ac74-d979-4c57-a38d-bc71a8e17c32
+		summarizeBy: none
+		sourceColumn: ProviderKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProviderID
+		dataType: string
+		lineageTag: e3314a91-d301-47d6-9252-54da543ea040
+		summarizeBy: none
+		sourceColumn: ProviderID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProviderName
+		dataType: string
+		lineageTag: 8004105e-56db-4506-ae0c-8bac7e171ef2
+		summarizeBy: none
+		sourceColumn: ProviderName
+
+		annotation SummarizationSetBy = Automatic
+
+	column Specialty
+		dataType: string
+		lineageTag: 899fa1ae-9d24-4757-a3bf-d6b9b1a5d18d
+		summarizeBy: none
+		sourceColumn: Specialty
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: 1d7dc097-a5cc-406f-980d-311d4a6cdf3b
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimProvider = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DimProvider.csv"), [Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"ProviderKey", Int64.Type}, {"ProviderID", type text}, {"ProviderName", type text}, {"Specialty", type text}, {"Region", type text}}, "en-US"),
+				    Trimmed = Table.TransformColumns(Typed, {{"ProviderID", Text.Trim, type text}, {"ProviderName", Text.Trim, type text}, {"Specialty", Text.Trim, type text}, {"Region", Text.Trim, type text}})
+				in
+				    Trimmed
+
+	annotation PBI_ResultType = Table
+

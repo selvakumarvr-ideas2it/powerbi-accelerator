@@ -1,0 +1,42 @@
+table DimPayer
+	lineageTag: 1731f181-e009-4992-a2fe-71352a7164db
+
+	column PayerKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 4e929602-c0cd-458b-b2d2-5602d2511709
+		summarizeBy: none
+		sourceColumn: PayerKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column PayerName
+		dataType: string
+		lineageTag: ad5e943d-765b-4c24-817d-9a8ba4cbd7c0
+		summarizeBy: none
+		sourceColumn: PayerName
+
+		annotation SummarizationSetBy = Automatic
+
+	column LOB
+		dataType: string
+		lineageTag: 43b2cbd9-1465-4764-8e2e-7fc8caeb9483
+		summarizeBy: none
+		sourceColumn: LOB
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimPayer = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DimPayer.csv"), [Delimiter=",", Columns=3, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"PayerKey", Int64.Type}, {"PayerName", type text}, {"LOB", type text}}, "en-US"),
+				    Trimmed = Table.TransformColumns(Typed, {{"PayerName", Text.Trim, type text}, {"LOB", Text.Trim, type text}})
+				in
+				    Trimmed
+
+	annotation PBI_ResultType = Table
+

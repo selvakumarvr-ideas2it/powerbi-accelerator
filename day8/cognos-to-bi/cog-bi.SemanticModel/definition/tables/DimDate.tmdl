@@ -1,0 +1,60 @@
+table DimDate
+	lineageTag: 232e15d3-c89d-4778-80dc-2ef584e76606
+
+	column DateKey
+		dataType: string
+		lineageTag: 1822ce82-7eb6-4457-ac5f-5ba19564173c
+		summarizeBy: none
+		sourceColumn: DateKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrderYear
+		dataType: string
+		lineageTag: 91acbd2e-3bf6-4bd0-8e03-aec151bd033f
+		summarizeBy: none
+		sourceColumn: OrderYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrderMonth
+		dataType: string
+		lineageTag: 3fb9e19b-c623-4ade-9531-87ea41aef4d3
+		summarizeBy: none
+		sourceColumn: OrderMonth
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthName
+		dataType: string
+		lineageTag: 52800516-4454-48f1-b49d-85280f4ef5ad
+		summarizeBy: none
+		sourceColumn: MonthName
+
+	column Quarter
+		dataType: string
+		lineageTag: 8c8aa362-f68d-410d-83ee-796955f3f3f7
+		summarizeBy: none
+		sourceColumn: Quarter
+
+	partition DimDate = m
+		mode: import
+		source =
+				let
+				  data = Table.FromRecords({
+				    [DateKey=20230101, OrderYear=2023, OrderMonth=1, MonthName="January", Quarter="Q1"],
+				    [DateKey=20230201, OrderYear=2023, OrderMonth=2, MonthName="February", Quarter="Q1"],
+				    [DateKey=20230301, OrderYear=2023, OrderMonth=3, MonthName="March", Quarter="Q1"],
+				    [DateKey=20230401, OrderYear=2023, OrderMonth=4, MonthName="April", Quarter="Q2"],
+				    [DateKey=20230501, OrderYear=2023, OrderMonth=5, MonthName="May", Quarter="Q2"],
+				    [DateKey=20230601, OrderYear=2023, OrderMonth=6, MonthName="June", Quarter="Q2"],
+				    [DateKey=20230701, OrderYear=2023, OrderMonth=7, MonthName="July", Quarter="Q3"],
+				    [DateKey=20230801, OrderYear=2023, OrderMonth=8, MonthName="August", Quarter="Q3"],
+				    [DateKey=20230901, OrderYear=2023, OrderMonth=9, MonthName="September", Quarter="Q3"],
+				    [DateKey=20231001, OrderYear=2023, OrderMonth=10, MonthName="October", Quarter="Q4"],
+				    [DateKey=20231101, OrderYear=2023, OrderMonth=11, MonthName="November", Quarter="Q4"],
+				    [DateKey=20231201, OrderYear=2023, OrderMonth=12, MonthName="December", Quarter="Q4"]
+				  })
+				in
+				  data
+

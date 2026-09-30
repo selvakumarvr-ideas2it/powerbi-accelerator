@@ -1,0 +1,217 @@
+table FactSales
+	lineageTag: a2e23ca0-a3b7-4d29-b40c-8c3ac460cf3c
+
+	measure 'Total Revenue' = SUM(FactSales[Revenue])
+		formatString: $#,0.00
+		lineageTag: 284c10a0-8a6e-4fd9-8716-f351c07f6845
+
+	measure 'Total Cost' = SUM(FactSales[Cost])
+		formatString: $#,0.00
+		lineageTag: c43c878a-5513-4a47-9d13-fc4a2c2a9a2c
+
+	measure 'Total Quantity' = SUM(FactSales[Quantity])
+		formatString: #,0
+		lineageTag: d7b6be35-5dfd-46e2-afe1-63822aec5549
+
+	measure 'Gross Profit' = SUM(FactSales[Revenue]) - SUM(FactSales[Cost])
+		formatString: $#,0.00
+		lineageTag: e84b3999-210e-4a77-8f55-bbf7cedc84f4
+
+	measure 'Net Revenue' = SUM(FactSales[Revenue]) - SUM(FactSales[Discount])
+		formatString: $#,0.00
+		lineageTag: 5559043f-dc39-4b28-9f1c-c443c3b30e9a
+
+	measure 'Avg Unit Price' = AVERAGE(FactSales[Price])
+		formatString: $#,0.00
+		lineageTag: 4cb502b7-869c-40f8-8b3b-553fff2b9769
+
+	column OrderYear
+		dataType: string
+		lineageTag: c66a0c57-37f5-4150-b368-0208afab6087
+		summarizeBy: none
+		sourceColumn: OrderYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrderMonth
+		dataType: string
+		lineageTag: 81729556-b7fd-46ee-bcca-02d9bdf01a58
+		summarizeBy: none
+		sourceColumn: OrderMonth
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: string
+		lineageTag: 189eab1a-de75-48aa-921a-348ba7ff2d18
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: 3dfa95cf-abab-4777-b9fb-73b9e983ed70
+		summarizeBy: none
+		sourceColumn: Region
+
+	column Revenue
+		dataType: double
+		lineageTag: 77dec49e-18d9-4805-898f-82226288edad
+		summarizeBy: sum
+		sourceColumn: Revenue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Cost
+		dataType: double
+		lineageTag: 5fbe5307-7e52-430e-b39e-59f107f0b31a
+		summarizeBy: sum
+		sourceColumn: Cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Quantity
+		dataType: double
+		lineageTag: aaa3f7cb-9deb-4bcf-9ccb-5bf2bf708fd3
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Price
+		dataType: double
+		lineageTag: 5e71f965-f335-4849-9a25-5d65a37defaf
+		summarizeBy: sum
+		sourceColumn: Price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Discount
+		dataType: double
+		lineageTag: 30a6caad-4e89-427f-a487-962fa1b5045a
+		summarizeBy: sum
+		sourceColumn: Discount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition FactSales = m
+		mode: import
+		source =
+				let
+				  data = Table.FromRecords({
+				    [OrderYear=2023, OrderMonth=1, ProductKey=1, Region="North", Revenue=15000, Cost=7500, Quantity=150, Price=100, Discount=750],
+				    [OrderYear=2023, OrderMonth=1, ProductKey=2, Region="South", Revenue=12000, Cost=6000, Quantity=120, Price=100, Discount=600],
+				    [OrderYear=2023, OrderMonth=1, ProductKey=3, Region="East", Revenue=18000, Cost=9000, Quantity=180, Price=100, Discount=900],
+				    [OrderYear=2023, OrderMonth=1, ProductKey=4, Region="West", Revenue=14000, Cost=7000, Quantity=140, Price=100, Discount=700],
+				    [OrderYear=2023, OrderMonth=1, ProductKey=5, Region="North", Revenue=16500, Cost=8250, Quantity=165, Price=100, Discount=825],
+				    [OrderYear=2023, OrderMonth=1, ProductKey=6, Region="South", Revenue=13500, Cost=6750, Quantity=135, Price=100, Discount=675],
+				    [OrderYear=2023, OrderMonth=1, ProductKey=7, Region="East", Revenue=17000, Cost=8500, Quantity=170, Price=100, Discount=850],
+				    [OrderYear=2023, OrderMonth=1, ProductKey=8, Region="West", Revenue=15500, Cost=7750, Quantity=155, Price=100, Discount=775],
+				    [OrderYear=2023, OrderMonth=2, ProductKey=1, Region="West", Revenue=16000, Cost=8000, Quantity=160, Price=100, Discount=800],
+				    [OrderYear=2023, OrderMonth=2, ProductKey=2, Region="North", Revenue=14000, Cost=7000, Quantity=140, Price=100, Discount=700],
+				    [OrderYear=2023, OrderMonth=2, ProductKey=3, Region="South", Revenue=20000, Cost=10000, Quantity=200, Price=100, Discount=1000],
+				    [OrderYear=2023, OrderMonth=2, ProductKey=4, Region="East", Revenue=15500, Cost=7750, Quantity=155, Price=100, Discount=775],
+				    [OrderYear=2023, OrderMonth=2, ProductKey=5, Region="West", Revenue=17000, Cost=8500, Quantity=170, Price=100, Discount=850],
+				    [OrderYear=2023, OrderMonth=2, ProductKey=6, Region="North", Revenue=14500, Cost=7250, Quantity=145, Price=100, Discount=725],
+				    [OrderYear=2023, OrderMonth=2, ProductKey=7, Region="South", Revenue=18500, Cost=9250, Quantity=185, Price=100, Discount=925],
+				    [OrderYear=2023, OrderMonth=2, ProductKey=8, Region="East", Revenue=16500, Cost=8250, Quantity=165, Price=100, Discount=825],
+				    [OrderYear=2023, OrderMonth=3, ProductKey=1, Region="East", Revenue=17000, Cost=8500, Quantity=170, Price=100, Discount=850],
+				    [OrderYear=2023, OrderMonth=3, ProductKey=2, Region="West", Revenue=15000, Cost=7500, Quantity=150, Price=100, Discount=750],
+				    [OrderYear=2023, OrderMonth=3, ProductKey=3, Region="North", Revenue=19000, Cost=9500, Quantity=190, Price=100, Discount=950],
+				    [OrderYear=2023, OrderMonth=3, ProductKey=4, Region="South", Revenue=16500, Cost=8250, Quantity=165, Price=100, Discount=825],
+				    [OrderYear=2023, OrderMonth=3, ProductKey=5, Region="East", Revenue=18500, Cost=9250, Quantity=185, Price=100, Discount=925],
+				    [OrderYear=2023, OrderMonth=3, ProductKey=6, Region="West", Revenue=15500, Cost=7750, Quantity=155, Price=100, Discount=775],
+				    [OrderYear=2023, OrderMonth=3, ProductKey=7, Region="North", Revenue=20000, Cost=10000, Quantity=200, Price=100, Discount=1000],
+				    [OrderYear=2023, OrderMonth=3, ProductKey=8, Region="South", Revenue=17500, Cost=8750, Quantity=175, Price=100, Discount=875],
+				    [OrderYear=2023, OrderMonth=4, ProductKey=1, Region="South", Revenue=16500, Cost=8250, Quantity=165, Price=100, Discount=825],
+				    [OrderYear=2023, OrderMonth=4, ProductKey=2, Region="East", Revenue=13500, Cost=6750, Quantity=135, Price=100, Discount=675],
+				    [OrderYear=2023, OrderMonth=4, ProductKey=3, Region="West", Revenue=21000, Cost=10500, Quantity=210, Price=100, Discount=1050],
+				    [OrderYear=2023, OrderMonth=4, ProductKey=4, Region="North", Revenue=15000, Cost=7500, Quantity=150, Price=100, Discount=750],
+				    [OrderYear=2023, OrderMonth=4, ProductKey=5, Region="South", Revenue=17500, Cost=8750, Quantity=175, Price=100, Discount=875],
+				    [OrderYear=2023, OrderMonth=4, ProductKey=6, Region="East", Revenue=14000, Cost=7000, Quantity=140, Price=100, Discount=700],
+				    [OrderYear=2023, OrderMonth=4, ProductKey=7, Region="West", Revenue=19000, Cost=9500, Quantity=190, Price=100, Discount=950],
+				    [OrderYear=2023, OrderMonth=4, ProductKey=8, Region="North", Revenue=16000, Cost=8000, Quantity=160, Price=100, Discount=800],
+				    [OrderYear=2023, OrderMonth=5, ProductKey=1, Region="North", Revenue=18000, Cost=9000, Quantity=180, Price=100, Discount=900],
+				    [OrderYear=2023, OrderMonth=5, ProductKey=2, Region="South", Revenue=16000, Cost=8000, Quantity=160, Price=100, Discount=800],
+				    [OrderYear=2023, OrderMonth=5, ProductKey=3, Region="East", Revenue=22000, Cost=11000, Quantity=220, Price=100, Discount=1100],
+				    [OrderYear=2023, OrderMonth=5, ProductKey=4, Region="West", Revenue=17000, Cost=8500, Quantity=170, Price=100, Discount=850],
+				    [OrderYear=2023, OrderMonth=5, ProductKey=5, Region="North", Revenue=19500, Cost=9750, Quantity=195, Price=100, Discount=975],
+				    [OrderYear=2023, OrderMonth=5, ProductKey=6, Region="South", Revenue=15500, Cost=7750, Quantity=155, Price=100, Discount=775],
+				    [OrderYear=2023, OrderMonth=5, ProductKey=7, Region="East", Revenue=20500, Cost=10250, Quantity=205, Price=100, Discount=1025],
+				    [OrderYear=2023, OrderMonth=5, ProductKey=8, Region="West", Revenue=18000, Cost=9000, Quantity=180, Price=100, Discount=900],
+				    [OrderYear=2023, OrderMonth=6, ProductKey=1, Region="West", Revenue=15500, Cost=7750, Quantity=155, Price=100, Discount=775],
+				    [OrderYear=2023, OrderMonth=6, ProductKey=2, Region="North", Revenue=17000, Cost=8500, Quantity=170, Price=100, Discount=850],
+				    [OrderYear=2023, OrderMonth=6, ProductKey=3, Region="South", Revenue=20000, Cost=10000, Quantity=200, Price=100, Discount=1000],
+				    [OrderYear=2023, OrderMonth=6, ProductKey=4, Region="East", Revenue=16500, Cost=8250, Quantity=165, Price=100, Discount=825],
+				    [OrderYear=2023, OrderMonth=6, ProductKey=5, Region="West", Revenue=18500, Cost=9250, Quantity=185, Price=100, Discount=925],
+				    [OrderYear=2023, OrderMonth=6, ProductKey=6, Region="North", Revenue=14500, Cost=7250, Quantity=145, Price=100, Discount=725],
+				    [OrderYear=2023, OrderMonth=6, ProductKey=7, Region="South", Revenue=19500, Cost=9750, Quantity=195, Price=100, Discount=975],
+				    [OrderYear=2023, OrderMonth=6, ProductKey=8, Region="East", Revenue=17000, Cost=8500, Quantity=170, Price=100, Discount=850],
+				    [OrderYear=2023, OrderMonth=7, ProductKey=1, Region="East", Revenue=19000, Cost=9500, Quantity=190, Price=100, Discount=950],
+				    [OrderYear=2023, OrderMonth=7, ProductKey=2, Region="West", Revenue=14500, Cost=7250, Quantity=145, Price=100, Discount=725],
+				    [OrderYear=2023, OrderMonth=7, ProductKey=3, Region="North", Revenue=23000, Cost=11500, Quantity=230, Price=100, Discount=1150],
+				    [OrderYear=2023, OrderMonth=7, ProductKey=4, Region="South", Revenue=17500, Cost=8750, Quantity=175, Price=100, Discount=875],
+				    [OrderYear=2023, OrderMonth=7, ProductKey=5, Region="East", Revenue=20000, Cost=10000, Quantity=200, Price=100, Discount=1000],
+				    [OrderYear=2023, OrderMonth=7, ProductKey=6, Region="West", Revenue=16000, Cost=8000, Quantity=160, Price=100, Discount=800],
+				    [OrderYear=2023, OrderMonth=7, ProductKey=7, Region="North", Revenue=21500, Cost=10750, Quantity=215, Price=100, Discount=1075],
+				    [OrderYear=2023, OrderMonth=7, ProductKey=8, Region="South", Revenue=18500, Cost=9250, Quantity=185, Price=100, Discount=925],
+				    [OrderYear=2023, OrderMonth=8, ProductKey=1, Region="South", Revenue=17500, Cost=8750, Quantity=175, Price=100, Discount=875],
+				    [OrderYear=2023, OrderMonth=8, ProductKey=2, Region="East", Revenue=15500, Cost=7750, Quantity=155, Price=100, Discount=775],
+				    [OrderYear=2023, OrderMonth=8, ProductKey=3, Region="West", Revenue=21500, Cost=10750, Quantity=215, Price=100, Discount=1075],
+				    [OrderYear=2023, OrderMonth=8, ProductKey=4, Region="North", Revenue=16500, Cost=8250, Quantity=165, Price=100, Discount=825],
+				    [OrderYear=2023, OrderMonth=8, ProductKey=5, Region="South", Revenue=19000, Cost=9500, Quantity=190, Price=100, Discount=950],
+				    [OrderYear=2023, OrderMonth=8, ProductKey=6, Region="East", Revenue=15000, Cost=7500, Quantity=150, Price=100, Discount=750],
+				    [OrderYear=2023, OrderMonth=8, ProductKey=7, Region="West", Revenue=20500, Cost=10250, Quantity=205, Price=100, Discount=1025],
+				    [OrderYear=2023, OrderMonth=8, ProductKey=8, Region="North", Revenue=17000, Cost=8500, Quantity=170, Price=100, Discount=850],
+				    [OrderYear=2023, OrderMonth=9, ProductKey=1, Region="North", Revenue=16500, Cost=8250, Quantity=165, Price=100, Discount=825],
+				    [OrderYear=2023, OrderMonth=9, ProductKey=2, Region="South", Revenue=18000, Cost=9000, Quantity=180, Price=100, Discount=900],
+				    [OrderYear=2023, OrderMonth=9, ProductKey=3, Region="East", Revenue=22500, Cost=11250, Quantity=225, Price=100, Discount=1125],
+				    [OrderYear=2023, OrderMonth=9, ProductKey=4, Region="West", Revenue=17000, Cost=8500, Quantity=170, Price=100, Discount=850],
+				    [OrderYear=2023, OrderMonth=9, ProductKey=5, Region="North", Revenue=19500, Cost=9750, Quantity=195, Price=100, Discount=975],
+				    [OrderYear=2023, OrderMonth=9, ProductKey=6, Region="South", Revenue=16000, Cost=8000, Quantity=160, Price=100, Discount=800],
+				    [OrderYear=2023, OrderMonth=9, ProductKey=7, Region="East", Revenue=21000, Cost=10500, Quantity=210, Price=100, Discount=1050],
+				    [OrderYear=2023, OrderMonth=9, ProductKey=8, Region="West", Revenue=18500, Cost=9250, Quantity=185, Price=100, Discount=925],
+				    [OrderYear=2023, OrderMonth=10, ProductKey=1, Region="West", Revenue=18500, Cost=9250, Quantity=185, Price=100, Discount=925],
+				    [OrderYear=2023, OrderMonth=10, ProductKey=2, Region="North", Revenue=16000, Cost=8000, Quantity=160, Price=100, Discount=800],
+				    [OrderYear=2023, OrderMonth=10, ProductKey=3, Region="South", Revenue=24000, Cost=12000, Quantity=240, Price=100, Discount=1200],
+				    [OrderYear=2023, OrderMonth=10, ProductKey=4, Region="East", Revenue=18000, Cost=9000, Quantity=180, Price=100, Discount=900],
+				    [OrderYear=2023, OrderMonth=10, ProductKey=5, Region="West", Revenue=20000, Cost=10000, Quantity=200, Price=100, Discount=1000],
+				    [OrderYear=2023, OrderMonth=10, ProductKey=6, Region="North", Revenue=16500, Cost=8250, Quantity=165, Price=100, Discount=825],
+				    [OrderYear=2023, OrderMonth=10, ProductKey=7, Region="South", Revenue=22500, Cost=11250, Quantity=225, Price=100, Discount=1125],
+				    [OrderYear=2023, OrderMonth=10, ProductKey=8, Region="East", Revenue=19000, Cost=9500, Quantity=190, Price=100, Discount=950],
+				    [OrderYear=2023, OrderMonth=11, ProductKey=1, Region="East", Revenue=17000, Cost=8500, Quantity=170, Price=100, Discount=850],
+				    [OrderYear=2023, OrderMonth=11, ProductKey=2, Region="West", Revenue=15500, Cost=7750, Quantity=155, Price=100, Discount=775],
+				    [OrderYear=2023, OrderMonth=11, ProductKey=3, Region="North", Revenue=21500, Cost=10750, Quantity=215, Price=100, Discount=1075],
+				    [OrderYear=2023, OrderMonth=11, ProductKey=4, Region="South", Revenue=16500, Cost=8250, Quantity=165, Price=100, Discount=825],
+				    [OrderYear=2023, OrderMonth=11, ProductKey=5, Region="East", Revenue=18500, Cost=9250, Quantity=185, Price=100, Discount=925],
+				    [OrderYear=2023, OrderMonth=11, ProductKey=6, Region="West", Revenue=15000, Cost=7500, Quantity=150, Price=100, Discount=750],
+				    [OrderYear=2023, OrderMonth=11, ProductKey=7, Region="North", Revenue=20000, Cost=10000, Quantity=200, Price=100, Discount=1000],
+				    [OrderYear=2023, OrderMonth=11, ProductKey=8, Region="South", Revenue=17500, Cost=8750, Quantity=175, Price=100, Discount=875],
+				    [OrderYear=2023, OrderMonth=12, ProductKey=1, Region="South", Revenue=19000, Cost=9500, Quantity=190, Price=100, Discount=950],
+				    [OrderYear=2023, OrderMonth=12, ProductKey=2, Region="East", Revenue=17000, Cost=8500, Quantity=170, Price=100, Discount=850],
+				    [OrderYear=2023, OrderMonth=12, ProductKey=3, Region="West", Revenue=25000, Cost=12500, Quantity=250, Price=100, Discount=1250],
+				    [OrderYear=2023, OrderMonth=12, ProductKey=4, Region="North", Revenue=18500, Cost=9250, Quantity=185, Price=100, Discount=925],
+				    [OrderYear=2023, OrderMonth=12, ProductKey=5, Region="South", Revenue=20500, Cost=10250, Quantity=205, Price=100, Discount=1025],
+				    [OrderYear=2023, OrderMonth=12, ProductKey=6, Region="East", Revenue=17000, Cost=8500, Quantity=170, Price=100, Discount=850],
+				    [OrderYear=2023, OrderMonth=12, ProductKey=7, Region="West", Revenue=23000, Cost=11500, Quantity=230, Price=100, Discount=1150],
+				    [OrderYear=2023, OrderMonth=12, ProductKey=8, Region="North", Revenue=19500, Cost=9750, Quantity=195, Price=100, Discount=975]
+				  }),
+				    #"Changed Type" = Table.TransformColumnTypes(data,{{"Revenue", type number}, {"Cost", type number}, {"Quantity", type number}, {"Price", type number}, {"Discount", type number}})
+				in
+				  #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

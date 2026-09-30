@@ -1,0 +1,21 @@
+{
+  "name": "Optum Healthcare",
+  "dataColors": ["#002677", "#FF612B", "#636363", "#4C6FB5", "#FF9A73", "#959595", "#7A92C2", "#B3B3B3"],
+  "background": "#FFFFFF",
+  "backgroundLight": "#F5F5F5",
+  "backgroundNeutral": "#E0E0E0",
+  "foreground": "#222222",
+  "foregroundNeutralSecondary": "#636363",
+  "tableAccent": "#002677",
+  "visualStyles": {
+    "card": {
+      "*": {
+        "title":  [{ "show": true, "fontColor": "#222222", "fontSize": 12, "bold": true, "fontFamily": "Segoe UI" }],
+        "labels": [{ "color": "#002677", "fontSize": 28, "bold": true, "fontFamily": "Segoe UI" }]
+      }
+    },
+    "lineChart":         { "*": { "title": [{ "show": true, "fontColor": "#222222", "fontSize": 12, "bold": true, "fontFamily": "Segoe UI" }] } },
+    "clusteredBarChart": { "*": { "title": [{ "show": true, "fontColor": "#222222", "fontSize": 12, "bold": true, "fontFamily": "Segoe UI" }] } },
+    "slicer":            { "*": { "title": [{ "show": true, "fontColor": "#222222", "fontSize": 12, "bold": true, "fontFamily": "Segoe UI" }] } }
+  }
+}

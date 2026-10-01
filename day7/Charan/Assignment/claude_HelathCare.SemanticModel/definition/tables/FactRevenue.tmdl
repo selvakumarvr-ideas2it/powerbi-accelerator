@@ -1,0 +1,78 @@
+table FactRevenue
+	lineageTag: ed97badc-e0a2-4ca1-8894-b4f064b154f3
+
+	/// Sum of monthly enrolled members (PMPM denominator). Responds to Date and Payer/LOB filters only.
+	measure 'Member Months' = SUM ( FactRevenue[MemberCount] )
+		formatString: #,0
+		displayFolder: 1 Core KPIs
+		lineageTag: e3a0b791-fc42-4eaa-9914-967f7440f9a6
+
+	/// Premium revenue from FactRevenue.
+	measure 'Total Revenue' = SUM ( FactRevenue[Revenue] )
+		formatString: $#,0
+		displayFolder: 1 Core KPIs
+		lineageTag: 43fb590c-a880-4b15-8eea-b755c11b72d5
+
+	/// MedicalCost column from FactRevenue; numerator of MCR so it shares grain with Revenue.
+	measure 'Medical Cost (Revenue Basis)' = SUM ( FactRevenue[MedicalCost] )
+		formatString: $#,0
+		displayFolder: 1 Core KPIs
+		lineageTag: 6a49145f-4fe2-4713-866a-a132e5417463
+
+	/// MedicalCost / Revenue, both from FactRevenue.
+	measure 'Medical Cost Ratio' = DIVIDE ( [Medical Cost (Revenue Basis)], [Total Revenue] )
+		formatString: 0.0%
+		displayFolder: 1 Core KPIs
+		lineageTag: 1350b7f1-f988-4faa-8464-814a3b2379ce
+
+	column RevenueKey
+		dataType: int64
+		isHidden
+		lineageTag: ee04a9fa-f2c0-4b32-9c3f-c93be0e54a28
+		summarizeBy: none
+		sourceColumn: RevenueKey
+
+	column Date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 2c0dbcba-2f6c-45d4-8831-fa5a3132e257
+		summarizeBy: none
+		sourceColumn: Date
+
+	column PayerKey
+		dataType: int64
+		isHidden
+		lineageTag: 0f7c2010-919b-4453-a210-966bcec55f93
+		summarizeBy: none
+		sourceColumn: PayerKey
+
+	column MemberCount
+		dataType: int64
+		lineageTag: 285d87b8-3970-4f0c-995f-e48669324e6f
+		summarizeBy: none
+		sourceColumn: MemberCount
+
+	column Revenue
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 06aeb738-11b2-4e63-8411-ad6df14f1b2c
+		summarizeBy: none
+		sourceColumn: Revenue
+
+	column MedicalCost
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 71037525-0ff5-457d-854b-8421a28d9f18
+		summarizeBy: none
+		sourceColumn: MedicalCost
+
+	partition FactRevenue = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\charan.lingeswaran\Downloads\Day7_Interactive_Report_Development\FactRevenue.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"RevenueKey", Int64.Type}, {"Date", type date}, {"PayerKey", Int64.Type}, {"MemberCount", Int64.Type}, {"Revenue", type number}, {"MedicalCost", type number}}, "en-US")
+				in
+				    Typed
+

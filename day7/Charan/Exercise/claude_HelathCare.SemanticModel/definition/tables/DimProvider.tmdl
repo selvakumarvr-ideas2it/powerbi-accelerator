@@ -1,0 +1,41 @@
+table DimProvider
+	lineageTag: c801a9eb-f0f2-485c-bd93-46ef18622f8a
+
+	column ProviderKey
+		dataType: int64
+		isHidden
+		isKey
+		lineageTag: e1cf3b1b-bb82-4a47-a35c-15da182fcb65
+		summarizeBy: none
+		sourceColumn: ProviderKey
+
+	column ProviderID
+		dataType: string
+		lineageTag: 21f0f966-5e59-4951-9a53-6d32d0bcbb25
+		sourceColumn: ProviderID
+
+	column ProviderName
+		dataType: string
+		lineageTag: d7b1cc37-4eca-4202-92de-836ad4e81cf2
+		sourceColumn: ProviderName
+
+	column Specialty
+		dataType: string
+		lineageTag: 3ca31dae-5cd6-4c6f-a53f-92a1d43f4df3
+		sourceColumn: Specialty
+
+	column Region
+		dataType: string
+		lineageTag: 524661d4-330f-49b9-a1bd-a35801fc1e3b
+		sourceColumn: Region
+
+	partition DimProvider = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\charan.lingeswaran\Downloads\Day7_Interactive_Report_Development\DimProvider.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"ProviderKey", Int64.Type}, {"ProviderID", type text}, {"ProviderName", type text}, {"Specialty", type text}, {"Region", type text}}, "en-US")
+				in
+				    Typed
+

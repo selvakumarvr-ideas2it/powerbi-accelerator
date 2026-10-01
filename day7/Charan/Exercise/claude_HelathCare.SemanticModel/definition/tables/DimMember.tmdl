@@ -1,0 +1,41 @@
+table DimMember
+	lineageTag: f05499da-f492-4056-b61d-6a6f0ac4e292
+
+	column MemberKey
+		dataType: int64
+		isHidden
+		isKey
+		lineageTag: c5b198ce-0bbe-4d49-a2a4-0e1723dfb4e3
+		summarizeBy: none
+		sourceColumn: MemberKey
+
+	column MemberID
+		dataType: string
+		lineageTag: 6f67d1ea-6a77-4de6-8de2-f51cccf858ea
+		sourceColumn: MemberID
+
+	column LOB
+		dataType: string
+		lineageTag: 9bf275eb-205a-40d7-95ba-3a38239a88d6
+		sourceColumn: LOB
+
+	column Region
+		dataType: string
+		lineageTag: 182aaaae-f74a-4677-a803-14b9365e74b3
+		sourceColumn: Region
+
+	column AgeBand
+		dataType: string
+		lineageTag: bb928193-8563-46c2-b78d-0ebda4fec48b
+		sourceColumn: AgeBand
+
+	partition DimMember = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\charan.lingeswaran\Downloads\Day7_Interactive_Report_Development\DimMember.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"MemberKey", Int64.Type}, {"MemberID", type text}, {"LOB", type text}, {"Region", type text}, {"AgeBand", type text}}, "en-US")
+				in
+				    Typed
+

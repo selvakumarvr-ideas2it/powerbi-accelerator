@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "claude_HelathCare"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "67464cb6-ebb9-466c-a8d3-3cc067608dfe"
+  }
+}

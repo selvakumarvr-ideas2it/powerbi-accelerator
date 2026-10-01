@@ -1,0 +1,180 @@
+table FactClaims
+	lineageTag: f32fd4b5-741e-4f68-babc-383156c5f5e7
+
+	/// Sum of ClaimCost (equals PaidAmount in source data).
+	measure 'Total Claims Cost' = SUM ( FactClaims[ClaimCost] )
+		formatString: $#,0
+		displayFolder: 1 Core KPIs
+		lineageTag: 92593c05-8bb3-4176-8972-304ea12241bf
+
+	/// Number of claim lines (one row per ClaimID).
+	measure 'Claim Count' = COUNTROWS ( FactClaims )
+		formatString: #,0
+		displayFolder: 1 Core KPIs
+		lineageTag: 9b5f556b-0e93-4820-8ca3-58aadafbc350
+
+	/// Distinct members with at least one claim in the current filter context.
+	measure 'Member Count' = DISTINCTCOUNT ( FactClaims[MemberKey] )
+		formatString: #,0
+		displayFolder: 1 Core KPIs
+		lineageTag: 1dc25b7c-3f84-442d-b915-c100efc92537
+
+	/// Per-member-per-month claims cost = Total Claims Cost / Member Months.
+	measure PMPM = DIVIDE ( [Total Claims Cost], [Member Months] )
+		formatString: $#,0.00
+		displayFolder: 1 Core KPIs
+		lineageTag: 2bdf7bb5-2eef-4de1-ba15-1ace57f0b720
+
+	measure 'Avg Claim Cost' = DIVIDE ( [Total Claims Cost], [Claim Count] )
+		formatString: $#,0.00
+		displayFolder: 1 Core KPIs
+		lineageTag: f3e1a990-bde0-43f9-9d0b-545f135aa65c
+
+	measure 'Total Claims Cost PY' = CALCULATE ( [Total Claims Cost], SAMEPERIODLASTYEAR ( DimDate[Date] ) )
+		formatString: $#,0
+		displayFolder: 2 Time Intelligence
+		lineageTag: 3be45c62-0e14-4f19-ad71-5d92c732802c
+
+	measure 'YoY Cost Growth %' =
+			VAR _PY = [Total Claims Cost PY]
+			RETURN IF ( NOT ISBLANK ( _PY ), DIVIDE ( [Total Claims Cost] - _PY, _PY ) )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 2 Time Intelligence
+		lineageTag: aae660ea-fd79-4b3a-997f-21b942aae98b
+
+	/// Claim count per 1,000 member months. Responds to Date and Payer/LOB filters for the denominator.
+	measure 'Claims per 1K Member Months' = DIVIDE ( [Claim Count], [Member Months] ) * 1000
+		formatString: #,0.0
+		displayFolder: 3 Utilization
+		lineageTag: d82f2013-898b-42f4-838a-73c4ab88abc2
+
+	measure 'Total Length of Stay Days' = SUM ( FactClaims[LengthOfStay] )
+		formatString: #,0
+		displayFolder: 3 Utilization
+		lineageTag: 7c88112b-747b-44bc-8a9d-cf3090feddea
+
+	measure 'Avg Length of Stay' = AVERAGE ( FactClaims[LengthOfStay] )
+		formatString: 0.0
+		displayFolder: 3 Utilization
+		lineageTag: 77b9aa71-9dbc-46e4-b5e0-ed74deb15c3e
+
+	measure 'Paid to Allowed %' = DIVIDE ( SUM ( FactClaims[PaidAmount] ), SUM ( FactClaims[AllowedAmount] ) )
+		formatString: 0.0%
+		displayFolder: 3 Utilization
+		lineageTag: ff0cab7e-7483-4824-b166-55f037e45e63
+
+	measure 'Selected LOB' = IF ( ISFILTERED ( DimPayer[LOB] ), IF ( HASONEVALUE ( DimPayer[LOB] ), SELECTEDVALUE ( DimPayer[LOB] ), "Multiple LOBs" ), "All LOBs" )
+		displayFolder: 4 Dynamic Titles
+		lineageTag: e8f6fb57-dfaa-4b00-aeaa-f744bfb913e4
+
+	measure 'Selected Payer' = IF ( ISFILTERED ( DimPayer[PayerName] ), IF ( HASONEVALUE ( DimPayer[PayerName] ), SELECTEDVALUE ( DimPayer[PayerName] ), "Multiple Payers" ), "All Payers" )
+		displayFolder: 4 Dynamic Titles
+		lineageTag: f9929ea9-f2e9-4800-94b8-a1b8f8fb5c9b
+
+	measure 'Selected Region' = IF ( ISFILTERED ( DimProvider[Region] ), IF ( HASONEVALUE ( DimProvider[Region] ), SELECTEDVALUE ( DimProvider[Region] ), "Multiple Regions" ), "All Regions" )
+		displayFolder: 4 Dynamic Titles
+		lineageTag: 1683093f-b945-4409-8cc2-8c3b55a06427
+
+	measure 'Selected Provider' = IF ( ISFILTERED ( DimProvider[ProviderName] ), IF ( HASONEVALUE ( DimProvider[ProviderName] ), SELECTEDVALUE ( DimProvider[ProviderName] ), "Multiple Providers" ), "All Providers" )
+		displayFolder: 4 Dynamic Titles
+		lineageTag: ced8b5f3-979b-4e42-9cba-b2797519a268
+
+	measure 'Title - Executive Overview' = "Payor Executive Overview  |  " & [Selected LOB] & "  |  " & [Selected Payer] & "  |  " & [Selected Region]
+		displayFolder: 4 Dynamic Titles
+		lineageTag: 46a91650-33dd-4e57-94da-873fc7969628
+
+	measure 'Title - Provider LOB Analysis' = "Provider / LOB Analysis  |  " & [Selected LOB] & "  |  " & [Selected Payer] & "  |  " & [Selected Region]
+		displayFolder: 4 Dynamic Titles
+		lineageTag: eebc0f54-a31f-42e6-875c-2c61c77d801b
+
+	measure 'Title - Member Claim Detail' = "Member / Claim Detail  |  " & [Selected Provider] & "  |  " & [Selected LOB] & "  |  " & [Selected Region]
+		displayFolder: 4 Dynamic Titles
+		lineageTag: 5872d153-1b90-4d86-b8cb-28e01a43c5b4
+
+	column ClaimKey
+		dataType: int64
+		isHidden
+		lineageTag: 22c37833-f2d4-4009-b55b-2212427bea23
+		summarizeBy: none
+		sourceColumn: ClaimKey
+
+	column ClaimID
+		dataType: string
+		lineageTag: 45670a34-30d1-48a6-9769-b2dbb0ec8e47
+		sourceColumn: ClaimID
+
+	column Date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 5ad44169-d2cf-487b-8e50-5027fd4b6542
+		summarizeBy: none
+		sourceColumn: Date
+
+	column MemberKey
+		dataType: int64
+		isHidden
+		lineageTag: 9986446c-8732-47c3-8a94-1c2042e67637
+		summarizeBy: none
+		sourceColumn: MemberKey
+
+	column ProviderKey
+		dataType: int64
+		isHidden
+		lineageTag: f8a5c65c-210d-4617-bdb7-11f99658e217
+		summarizeBy: none
+		sourceColumn: ProviderKey
+
+	column PayerKey
+		dataType: int64
+		isHidden
+		lineageTag: c41f40fc-bec8-484e-951b-0de0601acefc
+		summarizeBy: none
+		sourceColumn: PayerKey
+
+	column ServiceType
+		dataType: string
+		lineageTag: ffa3115f-5393-48f1-a5fe-74a2b3ed0e18
+		sourceColumn: ServiceType
+
+	column ClaimStatus
+		dataType: string
+		lineageTag: a5326501-f44c-491d-a5d3-759445e67097
+		sourceColumn: ClaimStatus
+
+	column AllowedAmount
+		dataType: double
+		formatString: #,0.00
+		lineageTag: d4a3ca23-0815-4be7-b4d8-82dd676ff2a4
+		summarizeBy: none
+		sourceColumn: AllowedAmount
+
+	column PaidAmount
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 218ae01f-f680-4d96-b205-42fc3c06f898
+		summarizeBy: none
+		sourceColumn: PaidAmount
+
+	column LengthOfStay
+		dataType: int64
+		lineageTag: 7f49d650-978b-4218-a0b1-bd43a01298dc
+		summarizeBy: none
+		sourceColumn: LengthOfStay
+
+	column ClaimCost
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 12f179c4-76d9-4163-80f2-056aaa7ef0d7
+		summarizeBy: none
+		sourceColumn: ClaimCost
+
+	partition FactClaims = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\charan.lingeswaran\Downloads\Day7_Interactive_Report_Development\FactClaims.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"ClaimKey", Int64.Type}, {"ClaimID", type text}, {"Date", type date}, {"MemberKey", Int64.Type}, {"ProviderKey", Int64.Type}, {"PayerKey", Int64.Type}, {"ServiceType", type text}, {"ClaimStatus", type text}, {"AllowedAmount", type number}, {"PaidAmount", type number}, {"LengthOfStay", Int64.Type}, {"ClaimCost", type number}}, "en-US")
+				in
+				    Typed
+

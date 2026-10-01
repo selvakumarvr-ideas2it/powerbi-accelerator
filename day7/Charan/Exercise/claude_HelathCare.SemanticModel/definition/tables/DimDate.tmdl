@@ -1,0 +1,88 @@
+table DimDate
+	lineageTag: fc572e07-1e25-48e2-b7ab-257becadd016
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: yyyy-mm-dd
+		lineageTag: 3ff829cb-fb6b-4310-911a-338fcaf15ce9
+		summarizeBy: none
+		sourceColumn: Date
+
+	column Year
+		dataType: int64
+		lineageTag: 2565d0c2-327b-4f66-8089-265d0550a660
+		summarizeBy: none
+		sourceColumn: Year
+
+	column Quarter
+		dataType: string
+		lineageTag: d2e16b93-b125-4367-a917-e511ee154258
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthNumber
+		dataType: int64
+		lineageTag: ab8beb06-f3e4-4693-a9cb-1ef94f1ede13
+		summarizeBy: none
+		sourceColumn: MonthNumber
+
+	column Month
+		dataType: string
+		lineageTag: 813f5c45-5a5d-4350-876f-fb1f7b33427b
+		summarizeBy: none
+		sourceColumn: Month
+		sortByColumn: MonthNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column YearMonth
+		dataType: string
+		lineageTag: 50585aea-6ce6-451d-99e3-b0ad0afe098d
+		summarizeBy: none
+		sourceColumn: YearMonth
+
+		annotation SummarizationSetBy = Automatic
+
+	column Week
+		dataType: int64
+		lineageTag: 9c5464d8-88f2-4a37-9525-40ae760278ed
+		summarizeBy: none
+		sourceColumn: Week
+
+	column DayOfWeek
+		dataType: string
+		lineageTag: acea135d-36ec-4872-8923-240ee9cc0177
+		summarizeBy: none
+		sourceColumn: DayOfWeek
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Date Hierarchy'
+		lineageTag: 3616f6d9-6fa6-4603-97f0-a7b36a849f46
+
+		level Year
+			lineageTag: fe047b3f-cd8e-4aa4-a730-6a0790ee2e5d
+			column: Year
+
+		level Quarter
+			lineageTag: 3f3d3108-9bbb-4ec5-ac35-3d3e405caf12
+			column: Quarter
+
+		level Month
+			lineageTag: 0208036b-0040-4e8e-a0c1-a4ad0f097e6a
+			column: Month
+
+	partition DimDate = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\charan.lingeswaran\Downloads\Day7_Interactive_Report_Development\DimDate.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"Date", type date}, {"Year", Int64.Type}, {"Quarter", type text}, {"MonthNumber", Int64.Type}, {"Month", type text}, {"YearMonth", type text}, {"Week", Int64.Type}, {"DayOfWeek", type text}}, "en-US")
+				in
+				    Typed
+

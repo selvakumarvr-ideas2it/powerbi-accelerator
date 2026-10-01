@@ -1,0 +1,8 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.0.0/schema.json",
+  "name": "3094d24f07362fde9d0b",
+  "displayName": "Test Cost View",
+  "explorationState": {
+    "activeSection": "01721782980a984e700e"
+  }
+}

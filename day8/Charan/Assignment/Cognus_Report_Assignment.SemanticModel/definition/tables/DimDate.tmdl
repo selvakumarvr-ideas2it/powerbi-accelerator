@@ -1,0 +1,83 @@
+/// Cognos query subject DimDate (daily grain). Year Month / YearMonthSort reproduce the qTrend query items.
+table DimDate
+	lineageTag: dac2e511-2111-4b6e-be62-3ee4337824b6
+
+	column Date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 8ad8994e-5213-47d7-85c7-d076567c1e6b
+		summarizeBy: none
+		sourceColumn: Date
+
+		variation Variation
+			isDefault
+			relationship: 9fab2ad1-18bb-4ac4-ba77-64f33d2162ae
+			defaultHierarchy: LocalDateTable_8e416428-b0d9-4753-bc5a-ca3ac4d53dea.'Date Hierarchy'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column DateKey
+		dataType: int64
+		isHidden
+		lineageTag: 01f5bec1-3d36-46a2-89f6-d4b000670b28
+		summarizeBy: none
+		sourceColumn: DateKey
+
+	column Year
+		dataType: int64
+		lineageTag: e28e0f30-424a-43a4-9baa-60a47ca498d4
+		summarizeBy: sum
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthNo
+		dataType: int64
+		isHidden
+		lineageTag: 44dbd8cb-067b-4b01-9787-72e29a54f762
+		summarizeBy: sum
+		sourceColumn: MonthNo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: string
+		lineageTag: 9e435054-7089-494c-b32f-a18f380bf2fc
+		summarizeBy: none
+		sourceColumn: Month
+		sortByColumn: MonthNo
+
+	column Quarter
+		dataType: string
+		lineageTag: 54e59df9-ee2b-403b-b2bd-02d925f076dc
+		summarizeBy: none
+		sourceColumn: Quarter
+
+	column 'Year Month'
+		dataType: string
+		lineageTag: c671d704-0144-4410-a4a8-b0149f9996d9
+		summarizeBy: none
+		sourceColumn: Year Month
+		sortByColumn: YearMonthSort
+
+	column YearMonthSort
+		dataType: int64
+		isHidden
+		lineageTag: 061ea5be-db36-424d-86c1-6676630ba423
+		summarizeBy: sum
+		sourceColumn: YearMonthSort
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimDate = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents(DataFolder & "\DimDate.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				  Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  Typed = Table.TransformColumnTypes(Promoted, {{"Date", type date}, {"DateKey", Int64.Type}, {"Year", Int64.Type}, {"MonthNo", Int64.Type}, {"Month", type text}, {"Quarter", type text}}, "en-US"),
+				  YM = Table.AddColumn(Typed, "Year Month", each [Month] & " " & Text.From([Year]), type text),
+				  YMS = Table.AddColumn(YM, "YearMonthSort", each [Year] * 100 + [MonthNo], Int64.Type)
+				in
+				  YMS
+

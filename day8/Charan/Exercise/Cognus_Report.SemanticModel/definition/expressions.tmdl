@@ -1,0 +1,6 @@
+/// Folder containing DimProduct.csv, DimDate.csv and FactSales.csv (synthetic package). Change this to repoint all tables.
+expression DataFolder = "C:\Users\charan.lingeswaran\Music\power bi\Healthcare\Data\synthetic_data" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: 411abca9-b417-4eae-ba63-cb57308127d6
+
+	annotation PBI_ResultType = Text
+

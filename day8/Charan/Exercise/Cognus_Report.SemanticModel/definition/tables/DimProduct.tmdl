@@ -1,0 +1,40 @@
+/// Product dimension (synthetic, from Complex Sales package). Source query: DimProduct.
+table DimProduct
+	lineageTag: a56fc880-f20c-4cad-8590-2bf4d9e02a15
+
+	column ProductKey
+		dataType: int64
+		isHidden
+		isKey
+		lineageTag: 80bda3ed-98c0-4fd7-a569-4c1776d987c7
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+	column ProductName
+		dataType: string
+		lineageTag: 3dd28385-56ee-4140-b3b9-ced819992760
+		summarizeBy: none
+		sourceColumn: ProductName
+
+	column ProductLine
+		dataType: string
+		lineageTag: a7ce3be0-180e-4063-b55f-721dc0a6f15f
+		summarizeBy: none
+		sourceColumn: ProductLine
+
+	column Category
+		dataType: string
+		lineageTag: 63e7e0c9-9da2-461f-bce7-6012d377ae85
+		summarizeBy: none
+		sourceColumn: Category
+
+	partition DimProduct = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents(DataFolder & "\DimProduct.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				  Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  Typed = Table.TransformColumnTypes(Promoted, {{"ProductKey", Int64.Type}, {"ProductName", type text}, {"ProductLine", type text}, {"Category", type text}})
+				in
+				  Typed
+

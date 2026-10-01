@@ -1,0 +1,26 @@
+/// Disconnected table replacing Cognos prompt pMetric (1 = Sales, 2 = Profit, default 1).
+table 'Trend Metric'
+	lineageTag: 1b1e89b0-43c0-4a12-aac6-70ea30306ad4
+
+	column Metric
+		dataType: string
+		lineageTag: 61b99141-8e5f-4c87-9321-542dfb826279
+		summarizeBy: none
+		sourceColumn: Metric
+		sortByColumn: MetricID
+
+	column MetricID
+		dataType: int64
+		isHidden
+		lineageTag: 937f19be-d0e7-4137-82cc-0261acd6da65
+		summarizeBy: none
+		sourceColumn: MetricID
+
+	partition 'Trend Metric' = m
+		mode: import
+		source =
+				let
+				  Source = #table(type table [Metric = text, MetricID = Int64.Type], {{"Sales", 1}, {"Profit", 2}})
+				in
+				  Source
+

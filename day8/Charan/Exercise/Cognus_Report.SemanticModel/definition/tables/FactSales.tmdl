@@ -1,0 +1,131 @@
+/// Sales fact (synthetic, from Complex Sales package; 3,010 rows, grain Year x Month x Product x Region). Source: FactSales.csv in the DataFolder parameter. Replace with real [Sales].[FactSales] later.
+table FactSales
+	lineageTag: 55e55e17-136d-4b9d-8e21-905249f79112
+
+	/// Cognos: [Sales].[FactSales].[Revenue], aggregate=total (assumed SUM).
+	measure 'Total Revenue' = SUM(FactSales[Revenue])
+		formatString: #,0.00
+		displayFolder: Sales Measures
+		lineageTag: adbde6e1-1338-4196-a6f2-d485a3d9fd11
+
+	/// Cognos: [Sales].[FactSales].[Cost], aggregate=total (assumed SUM).
+	measure 'Total Cost' = SUM(FactSales[Cost])
+		formatString: #,0.00
+		displayFolder: Sales Measures
+		lineageTag: b3602312-28fb-4c66-b0c2-3ba47fd041f7
+
+	/// Cognos: [Sales].[FactSales].[Quantity], aggregate=total (assumed SUM).
+	measure 'Total Quantity' = SUM(FactSales[Quantity])
+		formatString: #,0
+		displayFolder: Sales Measures
+		lineageTag: c487d9fd-8903-40e5-9d37-759a9c980076
+
+	/// Cognos: [Revenue] - [Cost], aggregate=total. Row-level SUMX; NULL handling differs slightly from Cognos.
+	measure 'Gross Profit' = SUMX(FactSales, FactSales[Revenue] - FactSales[Cost])
+		formatString: #,0.00
+		displayFolder: Sales Measures
+		lineageTag: 4d811679-df33-447a-9893-e485e5f077be
+
+	/// Cognos: [Revenue] - [Discount], aggregate=total. Discount treated as an amount.
+	measure 'Net Revenue' = SUMX(FactSales, FactSales[Revenue] - FactSales[Discount])
+		formatString: #,0.00
+		displayFolder: Sales Measures
+		lineageTag: 91eb6165-e404-4bf7-881f-41e2a805d758
+
+	/// Cognos: [Price], aggregate=average. Unweighted average of row-level Price.
+	measure 'Avg Unit Price' = AVERAGE(FactSales[Price])
+		formatString: #,0.00
+		displayFolder: Sales Measures
+		lineageTag: ed5e3d18-d5ce-446b-a6fc-ef2ef03002cf
+
+	/// Added KPI (not in XML): Gross Profit / Total Revenue.
+	measure 'Gross Margin %' = DIVIDE([Gross Profit], [Total Revenue])
+		formatString: 0.0%
+		displayFolder: Sales Measures
+		lineageTag: 4e5346de-b5d1-4a6d-bce7-c7c0555cc61f
+
+	/// Added KPI (not in XML): total Discount / Total Revenue.
+	measure 'Discount %' = DIVIDE(SUM(FactSales[Discount]), [Total Revenue])
+		formatString: 0.0%
+		displayFolder: Sales Measures
+		lineageTag: 6c7b24b2-6cae-4f2e-ba73-0c73c2c021aa
+
+	column OrderYear
+		dataType: int64
+		isHidden
+		lineageTag: 5dc64569-8c53-4393-bd8c-f9b751124084
+		summarizeBy: none
+		sourceColumn: OrderYear
+
+	column OrderMonth
+		dataType: int64
+		isHidden
+		lineageTag: ede32979-2475-4cb1-8d2e-91159d1a340b
+		summarizeBy: none
+		sourceColumn: OrderMonth
+
+	column ProductKey
+		dataType: int64
+		isHidden
+		lineageTag: cbcc230c-2d16-4185-8d83-5c3079caf055
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+	column Region
+		dataType: string
+		lineageTag: 9d45cbbe-e22b-440c-aa65-1bb4680c7253
+		summarizeBy: none
+		sourceColumn: Region
+
+	column Revenue
+		dataType: decimal
+		formatString: #,0.00
+		lineageTag: b2e9b4e2-9750-42fb-8c24-fe7ab4f36d8f
+		summarizeBy: none
+		sourceColumn: Revenue
+
+	column Cost
+		dataType: decimal
+		formatString: #,0.00
+		lineageTag: ea02f6b2-ca63-4be0-b094-0e6fcb71f2e5
+		summarizeBy: none
+		sourceColumn: Cost
+
+	column Quantity
+		dataType: int64
+		formatString: #,0
+		lineageTag: da703607-2077-4abc-859e-4813613b3b57
+		summarizeBy: none
+		sourceColumn: Quantity
+
+	column Price
+		dataType: decimal
+		formatString: #,0.00
+		lineageTag: b40a3797-f3ea-4741-b3d5-c11bd524995d
+		summarizeBy: none
+		sourceColumn: Price
+
+	column Discount
+		dataType: decimal
+		formatString: #,0.00
+		lineageTag: 25838069-5283-4fd8-8fa4-bfc6f2539366
+		summarizeBy: none
+		sourceColumn: Discount
+
+	/// Proposed helper key (YYYYMM) linking FactSales to DimDate[DateKey]. Not in the source XML.
+	column YearMonthKey = FactSales[OrderYear] * 100 + FactSales[OrderMonth]
+		dataType: int64
+		isHidden
+		lineageTag: ed3610a5-b708-4c63-9c3d-08f1595a9077
+		summarizeBy: none
+
+	partition FactSales = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents(DataFolder & "\FactSales.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				  Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  Typed = Table.TransformColumnTypes(Promoted, {{"OrderYear", Int64.Type}, {"OrderMonth", Int64.Type}, {"ProductKey", Int64.Type}, {"Region", type text}, {"Revenue", Currency.Type}, {"Cost", Currency.Type}, {"Quantity", Int64.Type}, {"Price", Currency.Type}, {"Discount", Currency.Type}}, "en-US")
+				in
+				  Typed
+

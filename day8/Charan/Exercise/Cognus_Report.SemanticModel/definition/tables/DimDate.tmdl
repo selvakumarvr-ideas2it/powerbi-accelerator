@@ -1,0 +1,47 @@
+/// Month-grain date dimension (synthetic, from Complex Sales package). DateKey assumed YYYYMM. Source query: DimDate.
+table DimDate
+	lineageTag: 159917b5-2030-4a3b-b654-43234bde67be
+
+	column DateKey
+		dataType: int64
+		isHidden
+		isKey
+		lineageTag: e2a76779-1cab-464e-a2fd-d6f524bfbf45
+		summarizeBy: none
+		sourceColumn: DateKey
+
+	column OrderYear
+		dataType: int64
+		lineageTag: 715839c9-9b19-4ba4-8c74-d340e12100f1
+		summarizeBy: none
+		sourceColumn: OrderYear
+
+	column OrderMonth
+		dataType: int64
+		lineageTag: 485879dd-42db-4a24-b59b-a28bfc93dfad
+		summarizeBy: none
+		sourceColumn: OrderMonth
+
+	column MonthName
+		dataType: string
+		lineageTag: a2c4205f-eb90-4eab-a0ba-6ff950b581d6
+		summarizeBy: none
+		sourceColumn: MonthName
+		sortByColumn: OrderMonth
+
+	column Quarter
+		dataType: string
+		lineageTag: b7102cf3-21de-4e47-a7cf-8f6b084619a1
+		summarizeBy: none
+		sourceColumn: Quarter
+
+	partition DimDate = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents(DataFolder & "\DimDate.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				  Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  Typed = Table.TransformColumnTypes(Promoted, {{"DateKey", Int64.Type}, {"OrderYear", Int64.Type}, {"OrderMonth", Int64.Type}, {"MonthName", type text}, {"Quarter", type text}})
+				in
+				  Typed
+

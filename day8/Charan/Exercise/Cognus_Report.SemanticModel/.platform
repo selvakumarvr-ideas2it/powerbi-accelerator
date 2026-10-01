@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Cognus_Report"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "1f59050c-1924-48d1-be8e-a6ecbe8b5507"
+  }
+}

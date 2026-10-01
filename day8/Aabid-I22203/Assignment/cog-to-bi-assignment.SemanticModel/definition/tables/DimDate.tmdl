@@ -1,0 +1,64 @@
+table DimDate
+	lineageTag: b3e24cb1-b8c8-4e3a-c51d-9d4c471eg85c
+
+	column Date
+		dataType: string
+		lineageTag: c66a0c57-37f5-4150-b368-0208afab6088
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column DateKey
+		dataType: string
+		lineageTag: 81729556-b7fd-46ee-bcca-02d9bdf01a59
+		dataCategory: Uncategorized
+		summarizeBy: none
+		sourceColumn: DateKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		dataType: int64
+		lineageTag: 189eab1a-de75-48aa-921a-348ba7ff2d1c
+		dataCategory: Year
+		summarizeBy: none
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthNo
+		dataType: int64
+		lineageTag: 189eab1a-de75-48aa-921a-348ba7ff2d1d
+		summarizeBy: none
+		sourceColumn: MonthNo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: string
+		lineageTag: 189eab1a-de75-48aa-921a-348ba7ff2d1e
+		dataCategory: Month
+		summarizeBy: none
+		sourceColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		dataType: string
+		lineageTag: 189eab1a-de75-48aa-921a-348ba7ff2d1f
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Partition1 = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents("C:\\malik\\power bi traning\\powerbi-accelerator\\cog-to-bi-asgnmt\\data\\DimDate.csv"),[Delimiter=",", Columns=6, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				  #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				  #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Date", type text}, {"DateKey", type text}, {"Year", Int64.Type}, {"MonthNo", Int64.Type}, {"Month", type text}, {"Quarter", type text}})
+				in
+				  #"Changed Type"
+

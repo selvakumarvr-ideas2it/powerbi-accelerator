@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\malik\\\\power bi traning\\\\powerbi-accelerator\\\\cognos-to-bi\" -Recurse -Force | Select-Object FullName, PSIsContainer | Format-Table -AutoSize)",
+      "mcp__powerbi-report-mcp__pbir_list_pages",
+      "mcp__powerbi-report-mcp__pbir_get_report",
+      "mcp__powerbi-report-mcp__pbir_set_report",
+      "mcp__powerbi-report-mcp__pbir_create_page",
+      "mcp__powerbi-report-mcp__pbir_add_visual",
+      "mcp__powerbi-report-mcp__pbir_set_page_background",
+      "mcp__powerbi-report-mcp__pbir_apply_theme",
+      "mcp__powerbi-report-mcp__pbir_list_visuals",
+      "Artifact",
+      "mcp__powerbi-authoring-local__partition_operations",
+      "mcp__powerbi-authoring-local__database_operations",
+      "mcp__powerbi-authoring-local__measure_operations",
+      "mcp__powerbi-report-mcp__pbir_move_visual",
+      "mcp__powerbi-report-mcp__pbir_format_visual",
+      "mcp__powerbi-report-mcp__pbir_reload_report"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "powerbi-report-mcp",
+    "powerbi-authoring-local"
+  ]
+}

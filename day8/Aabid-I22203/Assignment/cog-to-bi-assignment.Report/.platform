@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "cog-to-bi-assignment"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "e47cb615-f888-4535-91eb-2c29b32dedb7"
+  }
+}

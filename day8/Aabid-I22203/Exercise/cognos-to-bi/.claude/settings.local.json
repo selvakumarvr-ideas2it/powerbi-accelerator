@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__powerbi-authoring-local__model_operations",
+      "Bash(Get-ChildItem -Path \"C:\\\\malik\\\\power bi traning\\\\powerbi-accelerator\\\\cognos-to-bi\" -Recurse -Depth 2)",
+      "Bash(Select-Object -Property FullName, PSIsContainer)",
+      "mcp__powerbi-authoring-local__table_operations",
+      "mcp__powerbi-authoring-local__measure_operations",
+      "mcp__powerbi-report-mcp__pbir_get_report",
+      "mcp__powerbi-report-mcp__pbir_load_tools",
+      "mcp__powerbi-report-mcp__pbir_set_report",
+      "mcp__powerbi-report-mcp__pbir_create_page",
+      "mcp__powerbi-report-mcp__pbir_add_visual",
+      "mcp__powerbi-report-mcp__pbir_list_pages",
+      "Artifact",
+      "mcp__powerbi-authoring-local__database_operations",
+      "mcp__powerbi-report-mcp__pbir_model_usage",
+      "mcp__powerbi-report-mcp__pbir_get_visual",
+      "mcp__powerbi-authoring-local__column_operations",
+      "mcp__powerbi-report-mcp__pbir_move_visual",
+      "mcp__powerbi-report-mcp__pbir_apply_theme",
+      "mcp__powerbi-report-mcp__pbir_format_visual",
+      "mcp__powerbi-report-mcp__pbir_set_page_background",
+      "mcp__powerbi-report-mcp__pbir_change_visual_type",
+      "mcp__powerbi-report-mcp__pbir_guide",
+      "mcp__powerbi-report-mcp__pbir_list_visuals",
+      "mcp__powerbi-report-mcp__pbir_bulk_bind",
+      "mcp__powerbi-report-mcp__pbir_reload_report"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "powerbi-report-mcp",
+    "powerbi-authoring-local"
+  ]
+}

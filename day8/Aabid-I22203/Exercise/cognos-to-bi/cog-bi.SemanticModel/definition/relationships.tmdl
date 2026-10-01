@@ -1,0 +1,8 @@
+relationship FactSales_ProductKey_DimProduct_ProductKey
+	fromColumn: FactSales.ProductKey
+	toColumn: DimProduct.ProductKey
+
+relationship FactSales_OrderMonth_DimDate_OrderMonth
+	fromColumn: FactSales.OrderMonth
+	toColumn: DimDate.OrderMonth
+

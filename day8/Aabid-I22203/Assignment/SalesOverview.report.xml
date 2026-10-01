@@ -1,0 +1,927 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ===========================================================================================
+  IBM Cognos Analytics Report Specification: "Sales Overview"
+  Converted from: Projects/claude-powerbi.pbip (page "Sales Overview", theme "Forest Lavender")
+  Data source:    Data/*.csv (FactSales, DimDate, DimCustomer, DimProduct, DimRegion, DimSalesperson)
+  Target:         Cognos Analytics 11.2 / 12.x  (report schema 16.0)
+
+  DATA MODULE REQUIRED (modelPath below)
+  Upload the six CSVs from ./Data to Cognos and build a data module named "claude-powerbi"
+  containing these query subjects/columns (names must match exactly):
+
+    FactSales      SalesID (text), DateKey, CustomerKey, ProductKey, SalespersonKey, RegionKey,
+                   Quantity (int), SalesAmount, CostAmount, ProfitAmount (decimal, usage=Fact)
+    DimDate        Date (date), DateKey, Year, MonthNo (int), Month, Quarter (text)
+    DimCustomer    CustomerKey, CustomerName, Segment, RegionKey
+    DimProduct     ProductKey, Product, Category
+    DimRegion      RegionKey, Region
+    DimSalesperson SalespersonKey, Salesperson, RegionKey
+
+  Relationships (all 1..n from dimension to FactSales, same as relationships.tmdl):
+    DimDate.DateKey               = FactSales.DateKey
+    DimCustomer.CustomerKey       = FactSales.CustomerKey
+    DimProduct.ProductKey         = FactSales.ProductKey
+    DimSalesperson.SalespersonKey = FactSales.SalespersonKey
+    DimRegion.RegionKey           = FactSales.RegionKey
+  Do NOT join DimCustomer.RegionKey or DimSalesperson.RegionKey to DimRegion. In the Power BI
+  model they are the customer's and salesperson's home regions and are deliberately left
+  unrelated. The sales region comes only from FactSales.
+
+  PARAMETERS
+    pYear   (integer, default 2026) replaces the Power BI Year slicer and MAX(DimDate[Year]) logic
+    pMetric (integer, 1 = Sales, 2 = Profit, default 1) replaces the disconnected 'Trend Metric' table
+
+  DAX to Cognos mapping
+    Sales CY / Profit CY / Cost CY  total(case when Year = pYear   then <amount> end)
+    Sales LY / Profit LY / Cost LY  total(case when Year = pYear-1 then <amount> end)
+    Margin CY / LY                  Profit / nullif(Sales, 0)             (aggregate = calculated)
+    * YoY Label                     (CY - LY) / nullif(LY, 0), formatted +0.00%; null shows "n/a"
+    Margin YoY Label                (Margin CY - Margin LY) * 100, formatted "+0.0 pts"
+    Sales CY Top 5                  rank(Sales CY) <= 5 filter, applied after auto aggregation
+    Trend Value                     case pMetric when 2 then ProfitAmount else SalesAmount end
+    Year Month / YearMonthSort      calculated in the query (these were Power Query columns)
+    Decomposition tree              has no Cognos equivalent, so it is a crosstab: Region > Segment
+  ===========================================================================================
+-->
+<report xmlns="http://developer.cognos.com/schemas/report/16.0/" useStyleVersion="11.4" expressionLocale="en-us">
+  <modelPath type="module">/content/folder[@name='PowerBI-MCP']/module[@name='claude-powerbi']</modelPath>
+  <drillBehavior/>
+
+  <!-- ===================================== QUERIES ===================================== -->
+  <queries>
+
+    <!-- Year prompt values (Power BI Year slicer) -->
+    <query name="qYears">
+      <source><model/></source>
+      <selection>
+        <dataItem name="Year" aggregate="none" rollupAggregate="none" sort="descending">
+          <expression>[DimDate].[Year]</expression>
+        </dataItem>
+      </selection>
+    </query>
+
+    <!-- KPI cards: Sales / Profit / Margin / Cost (CY, LY, YoY) and header subtitle -->
+    <query name="qKPI">
+      <source><model/></source>
+      <selection>
+        <dataItem name="Sales CY" aggregate="total">
+          <expression>case when [DimDate].[Year] = #prompt('pYear','integer','2026')# then [FactSales].[SalesAmount] end</expression>
+        </dataItem>
+        <dataItem name="Sales LY" aggregate="total">
+          <expression>case when [DimDate].[Year] = #prompt('pYear','integer','2026')# - 1 then [FactSales].[SalesAmount] end</expression>
+        </dataItem>
+        <dataItem name="Profit CY" aggregate="total">
+          <expression>case when [DimDate].[Year] = #prompt('pYear','integer','2026')# then [FactSales].[ProfitAmount] end</expression>
+        </dataItem>
+        <dataItem name="Profit LY" aggregate="total">
+          <expression>case when [DimDate].[Year] = #prompt('pYear','integer','2026')# - 1 then [FactSales].[ProfitAmount] end</expression>
+        </dataItem>
+        <dataItem name="Cost CY" aggregate="total">
+          <expression>case when [DimDate].[Year] = #prompt('pYear','integer','2026')# then [FactSales].[CostAmount] end</expression>
+        </dataItem>
+        <dataItem name="Cost LY" aggregate="total">
+          <expression>case when [DimDate].[Year] = #prompt('pYear','integer','2026')# - 1 then [FactSales].[CostAmount] end</expression>
+        </dataItem>
+        <dataItem name="Margin CY" aggregate="calculated">
+          <expression>[Profit CY] / nullif([Sales CY], 0)</expression>
+        </dataItem>
+        <dataItem name="Margin LY" aggregate="calculated">
+          <expression>[Profit LY] / nullif([Sales LY], 0)</expression>
+        </dataItem>
+        <dataItem name="Sales YoY" aggregate="calculated">
+          <expression>([Sales CY] - [Sales LY]) / nullif([Sales LY], 0)</expression>
+        </dataItem>
+        <dataItem name="Profit YoY" aggregate="calculated">
+          <expression>([Profit CY] - [Profit LY]) / nullif([Profit LY], 0)</expression>
+        </dataItem>
+        <dataItem name="Cost YoY" aggregate="calculated">
+          <expression>([Cost CY] - [Cost LY]) / nullif([Cost LY], 0)</expression>
+        </dataItem>
+        <dataItem name="Margin YoY pts" aggregate="calculated">
+          <expression>([Margin CY] - [Margin LY]) * 100</expression>
+        </dataItem>
+        <dataItem name="Header Subtitle" aggregate="none" rollupAggregate="none">
+          <expression>'Fiscal year ' || cast(#prompt('pYear','integer','2026')#, varchar(4)) || '  ·  compared with ' || cast(#prompt('pYear','integer','2026')# - 1, varchar(4))</expression>
+        </dataItem>
+      </selection>
+      <detailFilters>
+        <detailFilter>
+          <filterExpression>[DimDate].[Year] between #prompt('pYear','integer','2026')# - 1 and #prompt('pYear','integer','2026')#</filterExpression>
+        </detailFilter>
+      </detailFilters>
+    </query>
+
+    <!-- "Revenue breakdown" (Power BI decomposition tree: Sales CY by Region > Segment) -->
+    <query name="qBreakdown">
+      <source><model/></source>
+      <selection>
+        <dataItem name="Region" aggregate="none" rollupAggregate="none">
+          <expression>[DimRegion].[Region]</expression>
+        </dataItem>
+        <dataItem name="Segment" aggregate="none" rollupAggregate="none">
+          <expression>[DimCustomer].[Segment]</expression>
+        </dataItem>
+        <dataItem name="Sales CY" aggregate="total">
+          <expression>[FactSales].[SalesAmount]</expression>
+        </dataItem>
+      </selection>
+      <detailFilters>
+        <detailFilter>
+          <filterExpression>[DimDate].[Year] = #prompt('pYear','integer','2026')#</filterExpression>
+        </detailFilter>
+      </detailFilters>
+    </query>
+
+    <!-- "Revenue by segment" -->
+    <query name="qSegment">
+      <source><model/></source>
+      <selection>
+        <dataItem name="Segment" aggregate="none" rollupAggregate="none">
+          <expression>[DimCustomer].[Segment]</expression>
+        </dataItem>
+        <dataItem name="Sales CY" aggregate="total">
+          <expression>case when [DimDate].[Year] = #prompt('pYear','integer','2026')# then [FactSales].[SalesAmount] end</expression>
+        </dataItem>
+        <dataItem name="Sales LY" aggregate="total">
+          <expression>case when [DimDate].[Year] = #prompt('pYear','integer','2026')# - 1 then [FactSales].[SalesAmount] end</expression>
+        </dataItem>
+      </selection>
+      <detailFilters>
+        <detailFilter>
+          <filterExpression>[DimDate].[Year] between #prompt('pYear','integer','2026')# - 1 and #prompt('pYear','integer','2026')#</filterExpression>
+        </detailFilter>
+      </detailFilters>
+    </query>
+
+    <!-- "Revenue by region" -->
+    <query name="qRegion">
+      <source><model/></source>
+      <selection>
+        <dataItem name="Region" aggregate="none" rollupAggregate="none">
+          <expression>[DimRegion].[Region]</expression>
+        </dataItem>
+        <dataItem name="Sales CY" aggregate="total">
+          <expression>case when [DimDate].[Year] = #prompt('pYear','integer','2026')# then [FactSales].[SalesAmount] end</expression>
+        </dataItem>
+        <dataItem name="Sales LY" aggregate="total">
+          <expression>case when [DimDate].[Year] = #prompt('pYear','integer','2026')# - 1 then [FactSales].[SalesAmount] end</expression>
+        </dataItem>
+      </selection>
+      <detailFilters>
+        <detailFilter>
+          <filterExpression>[DimDate].[Year] between #prompt('pYear','integer','2026')# - 1 and #prompt('pYear','integer','2026')#</filterExpression>
+        </detailFilter>
+      </detailFilters>
+    </query>
+
+    <!-- "Historical trends" (Trend Value by Year Month, Sales/Profit toggle) -->
+    <query name="qTrend">
+      <source><model/></source>
+      <selection>
+        <dataItem name="YearMonthSort" aggregate="none" rollupAggregate="none" sort="ascending">
+          <expression>[DimDate].[Year] * 100 + [DimDate].[MonthNo]</expression>
+        </dataItem>
+        <dataItem name="Year Month" aggregate="none" rollupAggregate="none">
+          <expression>[DimDate].[Month] || ' ' || cast([DimDate].[Year], varchar(4))</expression>
+        </dataItem>
+        <dataItem name="Trend Value" aggregate="total">
+          <expression>case when #prompt('pMetric','integer','1')# = 2 then [FactSales].[ProfitAmount] else [FactSales].[SalesAmount] end</expression>
+        </dataItem>
+      </selection>
+      <detailFilters>
+        <detailFilter>
+          <filterExpression>[DimDate].[Year] between #prompt('pYear','integer','2026')# - 1 and #prompt('pYear','integer','2026')#</filterExpression>
+        </detailFilter>
+      </detailFilters>
+    </query>
+
+    <!-- "Top 5 products" (ranked by Sales CY) -->
+    <query name="qTopProducts">
+      <source><model/></source>
+      <selection>
+        <dataItem name="Product" aggregate="none" rollupAggregate="none">
+          <expression>[DimProduct].[Product]</expression>
+        </dataItem>
+        <dataItem name="Sales CY Top 5" aggregate="total">
+          <expression>case when [DimDate].[Year] = #prompt('pYear','integer','2026')# then [FactSales].[SalesAmount] end</expression>
+        </dataItem>
+        <dataItem name="Sales LY Top 5" aggregate="total">
+          <expression>case when [DimDate].[Year] = #prompt('pYear','integer','2026')# - 1 then [FactSales].[SalesAmount] end</expression>
+        </dataItem>
+        <dataItem name="Sales Rank" aggregate="calculated">
+          <expression>rank([Sales CY Top 5])</expression>
+        </dataItem>
+      </selection>
+      <detailFilters>
+        <detailFilter>
+          <filterExpression>[DimDate].[Year] between #prompt('pYear','integer','2026')# - 1 and #prompt('pYear','integer','2026')#</filterExpression>
+        </detailFilter>
+        <detailFilter postAutoAggregation="true">
+          <filterExpression>[Sales Rank] &lt;= 5</filterExpression>
+        </detailFilter>
+      </detailFilters>
+    </query>
+
+  </queries>
+
+  <!-- ===================================== LAYOUT ====================================== -->
+  <layouts>
+    <layout>
+      <reportPages>
+        <page name="Sales Overview">
+          <style>
+            <defaultStyles><defaultStyle refStyle="pg"/></defaultStyles>
+            <CSS value="background-color:#F6F5F3;font-family:'Segoe UI',Helvetica,Arial,sans-serif"/>
+          </style>
+          <pageBody>
+            <style>
+              <defaultStyles><defaultStyle refStyle="pb"/></defaultStyles>
+              <CSS value="padding:0px"/>
+            </style>
+            <contents>
+
+              <!-- Outer shell: 80px forest-green sidebar + main canvas (1280 x 720 in Power BI) -->
+              <table>
+                <style>
+                  <defaultStyles><defaultStyle refStyle="tb"/></defaultStyles>
+                  <CSS value="border-collapse:collapse;width:1280px"/>
+                </style>
+                <tableRows>
+                  <tableRow>
+                    <tableCells>
+
+                      <tableCell>
+                        <contents/>
+                        <style><CSS value="width:80px;background-color:#29654B;vertical-align:top"/></style>
+                      </tableCell>
+
+                      <tableCell>
+                        <style><CSS value="vertical-align:top;padding:4px 15px 6px 15px"/></style>
+                        <contents>
+
+                          <!-- ============ Row 0: header (title, subtitle, Year prompt) ============ -->
+                          <table>
+                            <style><CSS value="width:100%;border-collapse:collapse"/></style>
+                            <tableRows>
+                              <tableRow>
+                                <tableCells>
+                                  <tableCell>
+                                    <style><CSS value="width:225px;vertical-align:middle"/></style>
+                                    <contents>
+                                      <textItem>
+                                        <dataSource><staticValue>Overview</staticValue></dataSource>
+                                        <style><CSS value="font-size:22pt;font-weight:bold;color:#1B1B1B"/></style>
+                                      </textItem>
+                                    </contents>
+                                  </tableCell>
+                                  <tableCell>
+                                    <style><CSS value="vertical-align:middle"/></style>
+                                    <contents>
+                                      <singleton name="sHeaderSubtitle" refQuery="qKPI">
+                                        <contents>
+                                          <textItem>
+                                            <dataSource><dataItemValue refDataItem="Header Subtitle"/></dataSource>
+                                            <style><CSS value="font-size:11pt;color:#6B6B6B"/></style>
+                                          </textItem>
+                                        </contents>
+                                      </singleton>
+                                    </contents>
+                                  </tableCell>
+                                  <tableCell>
+                                    <style><CSS value="width:220px;text-align:right;vertical-align:middle"/></style>
+                                    <contents>
+                                      <selectValue name="promptYear" parameter="pYear" refQuery="qYears"
+                                                   required="false" autoSubmit="true" selectValueUI="dropdown"
+                                                   hideAdornments="true">
+                                        <useItem refDataItem="Year"/>
+                                        <defaultSelections>
+                                          <defaultSimpleSelection>2026</defaultSimpleSelection>
+                                        </defaultSelections>
+                                        <style><CSS value="width:200px;background-color:#FFFFFF;border:1px solid #E6E4DF;color:#29654B"/></style>
+                                      </selectValue>
+                                    </contents>
+                                  </tableCell>
+                                </tableCells>
+                              </tableRow>
+                            </tableRows>
+                          </table>
+
+                          <!-- ============ Row 1: KPI cards ============ -->
+                          <table>
+                            <style><CSS value="width:100%;border-collapse:separate;border-spacing:5px 5px;margin-top:4px"/></style>
+                            <tableRows>
+                              <tableRow>
+                                <tableCells>
+
+                                  <!-- Sales -->
+                                  <tableCell>
+                                    <style><CSS value="width:25%;height:125px;background-color:#FFFFFF;border:1px solid #E6E4DF;padding:8px 14px;vertical-align:top"/></style>
+                                    <contents>
+                                      <singleton name="sSales" refQuery="qKPI">
+                                        <contents>
+                                          <block>
+                                            <contents>
+                                              <textItem>
+                                                <dataSource><staticValue>Sales</staticValue></dataSource>
+                                                <style><CSS value="font-size:10pt;color:#6B6B6B"/></style>
+                                              </textItem>
+                                            </contents>
+                                          </block>
+                                          <block>
+                                            <contents>
+                                              <textItem>
+                                                <dataSource><dataItemValue refDataItem="Sales CY"/></dataSource>
+                                                <style>
+                                                  <CSS value="font-size:26pt;font-weight:bold;color:#29654B"/>
+                                                  <dataFormat><currencyFormat currencyCode="USD" decimalSize="0" useGrouping="true"/></dataFormat>
+                                                </style>
+                                              </textItem>
+                                            </contents>
+                                          </block>
+                                          <block>
+                                            <contents>
+                                              <textItem>
+                                                <dataSource><dataItemValue refDataItem="Sales YoY"/></dataSource>
+                                                <style>
+                                                  <CSS value="font-size:10pt;font-weight:bold;color:#1B3D2E;background-color:#E3F42A;padding:2px 8px"/>
+                                                  <dataFormat><percentFormat pattern="+0.00%;-0.00%" missingValueCharacters="n/a" zeroValueCharacters="0.00%"/></dataFormat>
+                                                </style>
+                                              </textItem>
+                                              <textItem>
+                                                <dataSource><staticValue>  vs. last year</staticValue></dataSource>
+                                                <style><CSS value="font-size:9pt;color:#6B6B6B"/></style>
+                                              </textItem>
+                                            </contents>
+                                          </block>
+                                        </contents>
+                                      </singleton>
+                                    </contents>
+                                  </tableCell>
+
+                                  <!-- Profit -->
+                                  <tableCell>
+                                    <style><CSS value="width:25%;height:125px;background-color:#FFFFFF;border:1px solid #E6E4DF;padding:8px 14px;vertical-align:top"/></style>
+                                    <contents>
+                                      <singleton name="sProfit" refQuery="qKPI">
+                                        <contents>
+                                          <block>
+                                            <contents>
+                                              <textItem>
+                                                <dataSource><staticValue>Profit</staticValue></dataSource>
+                                                <style><CSS value="font-size:10pt;color:#6B6B6B"/></style>
+                                              </textItem>
+                                            </contents>
+                                          </block>
+                                          <block>
+                                            <contents>
+                                              <textItem>
+                                                <dataSource><dataItemValue refDataItem="Profit CY"/></dataSource>
+                                                <style>
+                                                  <CSS value="font-size:26pt;font-weight:bold;color:#29654B"/>
+                                                  <dataFormat><currencyFormat currencyCode="USD" decimalSize="0" useGrouping="true"/></dataFormat>
+                                                </style>
+                                              </textItem>
+                                            </contents>
+                                          </block>
+                                          <block>
+                                            <contents>
+                                              <textItem>
+                                                <dataSource><dataItemValue refDataItem="Profit YoY"/></dataSource>
+                                                <style>
+                                                  <CSS value="font-size:10pt;font-weight:bold;color:#1B3D2E;background-color:#E3F42A;padding:2px 8px"/>
+                                                  <dataFormat><percentFormat pattern="+0.00%;-0.00%" missingValueCharacters="n/a" zeroValueCharacters="0.00%"/></dataFormat>
+                                                </style>
+                                              </textItem>
+                                              <textItem>
+                                                <dataSource><staticValue>  vs. last year</staticValue></dataSource>
+                                                <style><CSS value="font-size:9pt;color:#6B6B6B"/></style>
+                                              </textItem>
+                                            </contents>
+                                          </block>
+                                        </contents>
+                                      </singleton>
+                                    </contents>
+                                  </tableCell>
+
+                                  <!-- Margin -->
+                                  <tableCell>
+                                    <style><CSS value="width:25%;height:125px;background-color:#FFFFFF;border:1px solid #E6E4DF;padding:8px 14px;vertical-align:top"/></style>
+                                    <contents>
+                                      <singleton name="sMargin" refQuery="qKPI">
+                                        <contents>
+                                          <block>
+                                            <contents>
+                                              <textItem>
+                                                <dataSource><staticValue>Profit margin</staticValue></dataSource>
+                                                <style><CSS value="font-size:10pt;color:#6B6B6B"/></style>
+                                              </textItem>
+                                            </contents>
+                                          </block>
+                                          <block>
+                                            <contents>
+                                              <textItem>
+                                                <dataSource><dataItemValue refDataItem="Margin CY"/></dataSource>
+                                                <style>
+                                                  <CSS value="font-size:26pt;font-weight:bold;color:#29654B"/>
+                                                  <dataFormat><percentFormat decimalSize="1"/></dataFormat>
+                                                </style>
+                                              </textItem>
+                                            </contents>
+                                          </block>
+                                          <block>
+                                            <contents>
+                                              <textItem>
+                                                <dataSource><dataItemValue refDataItem="Margin YoY pts"/></dataSource>
+                                                <style>
+                                                  <CSS value="font-size:10pt;font-weight:bold;color:#1B3D2E;background-color:#E3F42A;padding:2px 8px"/>
+                                                  <dataFormat><numberFormat pattern="+0.0' pts';-0.0' pts'" missingValueCharacters="n/a" zeroValueCharacters="0.0 pts"/></dataFormat>
+                                                </style>
+                                              </textItem>
+                                              <textItem>
+                                                <dataSource><staticValue>  vs. last year</staticValue></dataSource>
+                                                <style><CSS value="font-size:9pt;color:#6B6B6B"/></style>
+                                              </textItem>
+                                            </contents>
+                                          </block>
+                                        </contents>
+                                      </singleton>
+                                    </contents>
+                                  </tableCell>
+
+                                  <!-- Cost -->
+                                  <tableCell>
+                                    <style><CSS value="width:25%;height:125px;background-color:#FFFFFF;border:1px solid #E6E4DF;padding:8px 14px;vertical-align:top"/></style>
+                                    <contents>
+                                      <singleton name="sCost" refQuery="qKPI">
+                                        <contents>
+                                          <block>
+                                            <contents>
+                                              <textItem>
+                                                <dataSource><staticValue>Cost</staticValue></dataSource>
+                                                <style><CSS value="font-size:10pt;color:#6B6B6B"/></style>
+                                              </textItem>
+                                            </contents>
+                                          </block>
+                                          <block>
+                                            <contents>
+                                              <textItem>
+                                                <dataSource><dataItemValue refDataItem="Cost CY"/></dataSource>
+                                                <style>
+                                                  <CSS value="font-size:26pt;font-weight:bold;color:#29654B"/>
+                                                  <dataFormat><currencyFormat currencyCode="USD" decimalSize="0" useGrouping="true"/></dataFormat>
+                                                </style>
+                                              </textItem>
+                                            </contents>
+                                          </block>
+                                          <block>
+                                            <contents>
+                                              <textItem>
+                                                <dataSource><dataItemValue refDataItem="Cost YoY"/></dataSource>
+                                                <style>
+                                                  <CSS value="font-size:10pt;font-weight:bold;color:#1B3D2E;background-color:#E3F42A;padding:2px 8px"/>
+                                                  <dataFormat><percentFormat pattern="+0.00%;-0.00%" missingValueCharacters="n/a" zeroValueCharacters="0.00%"/></dataFormat>
+                                                </style>
+                                              </textItem>
+                                              <textItem>
+                                                <dataSource><staticValue>  vs. last year</staticValue></dataSource>
+                                                <style><CSS value="font-size:9pt;color:#6B6B6B"/></style>
+                                              </textItem>
+                                            </contents>
+                                          </block>
+                                        </contents>
+                                      </singleton>
+                                    </contents>
+                                  </tableCell>
+
+                                </tableCells>
+                              </tableRow>
+                            </tableRows>
+                          </table>
+
+                          <!-- ============ Row 2: Revenue breakdown | by segment | by region ============ -->
+                          <table>
+                            <style><CSS value="width:100%;border-collapse:separate;border-spacing:5px 5px"/></style>
+                            <tableRows>
+                              <tableRow>
+                                <tableCells>
+
+                                  <!-- Revenue breakdown (decomposition tree -> nested crosstab) -->
+                                  <tableCell>
+                                    <style><CSS value="width:575px;height:250px;background-color:#FFFFFF;border:1px solid #E6E4DF;padding:8px;vertical-align:top"/></style>
+                                    <contents>
+                                      <textItem>
+                                        <dataSource><staticValue>Revenue breakdown</staticValue></dataSource>
+                                        <style><CSS value="font-size:13pt;font-weight:bold;color:#29654B"/></style>
+                                      </textItem>
+                                      <crosstab name="ctRevenueBreakdown" refQuery="qBreakdown" horizontalPagination="true">
+                                        <crosstabCorner>
+                                          <contents>
+                                            <textItem><dataSource><staticValue>Region / Segment</staticValue></dataSource></textItem>
+                                          </contents>
+                                          <style>
+                                            <defaultStyles><defaultStyle refStyle="xm"/></defaultStyles>
+                                            <CSS value="background-color:#FBFAF8;color:#6B6B6B"/>
+                                          </style>
+                                        </crosstabCorner>
+                                        <crosstabRows>
+                                          <crosstabNode>
+                                            <crosstabNodeMembers>
+                                              <crosstabNodeMember refDataItem="Region">
+                                                <sortList><sortItem refDataItem="Sales CY" sortOrder="descending"/></sortList>
+                                                <contents>
+                                                  <textItem><dataSource><memberCaption/></dataSource></textItem>
+                                                </contents>
+                                                <style>
+                                                  <defaultStyles><defaultStyle refStyle="ml"/></defaultStyles>
+                                                  <CSS value="font-weight:bold;color:#1B3D2E"/>
+                                                </style>
+                                              </crosstabNodeMember>
+                                            </crosstabNodeMembers>
+                                            <crosstabNestedNodes>
+                                              <crosstabNode>
+                                                <crosstabNodeMembers>
+                                                  <crosstabNodeMember refDataItem="Segment">
+                                                    <sortList><sortItem refDataItem="Sales CY" sortOrder="descending"/></sortList>
+                                                    <contents>
+                                                      <textItem><dataSource><memberCaption/></dataSource></textItem>
+                                                    </contents>
+                                                    <style><defaultStyles><defaultStyle refStyle="ml"/></defaultStyles></style>
+                                                  </crosstabNodeMember>
+                                                </crosstabNodeMembers>
+                                              </crosstabNode>
+                                            </crosstabNestedNodes>
+                                          </crosstabNode>
+                                        </crosstabRows>
+                                        <crosstabColumns>
+                                          <crosstabNode>
+                                            <crosstabNodeMembers>
+                                              <crosstabNodeMember refDataItem="Sales CY">
+                                                <contents>
+                                                  <textItem><dataSource><dataItemLabel refDataItem="Sales CY"/></dataSource></textItem>
+                                                </contents>
+                                                <style>
+                                                  <defaultStyles><defaultStyle refStyle="ml"/></defaultStyles>
+                                                  <CSS value="background-color:#FBFAF8;color:#6B6B6B"/>
+                                                </style>
+                                              </crosstabNodeMember>
+                                            </crosstabNodeMembers>
+                                          </crosstabNode>
+                                        </crosstabColumns>
+                                        <crosstabFactCell>
+                                          <contents>
+                                            <textItem><dataSource><cellValue/></dataSource></textItem>
+                                          </contents>
+                                          <style>
+                                            <defaultStyles><defaultStyle refStyle="mv"/></defaultStyles>
+                                            <dataFormat><currencyFormat currencyCode="USD" decimalSize="0" useGrouping="true"/></dataFormat>
+                                          </style>
+                                        </crosstabFactCell>
+                                        <style>
+                                          <defaultStyles><defaultStyle refStyle="xt"/></defaultStyles>
+                                          <CSS value="border-collapse:collapse;width:100%;margin-top:6px"/>
+                                        </style>
+                                      </crosstab>
+                                    </contents>
+                                  </tableCell>
+
+                                  <!-- Revenue by segment -->
+                                  <tableCell>
+                                    <style><CSS value="width:292px;height:250px;background-color:#FFFFFF;border:1px solid #E6E4DF;padding:8px;vertical-align:top"/></style>
+                                    <contents>
+                                      <textItem>
+                                        <dataSource><staticValue>Revenue by segment</staticValue></dataSource>
+                                        <style><CSS value="font-size:13pt;font-weight:bold;color:#29654B"/></style>
+                                      </textItem>
+                                      <v2_combinationChart name="chSegment" refQuery="qSegment" orientation="horizontal" maxHotspots="10000">
+                                        <v2_combinationTypeTooltips/>
+                                        <v2_legend>
+                                          <v2_legendPosition><v2_legendPreset position="topCenter"/></v2_legendPosition>
+                                          <style><CSS value="font-size:8pt;color:#6B6B6B"/></style>
+                                        </v2_legend>
+                                        <v2_commonAxis>
+                                          <v2_ordinalAxis>
+                                            <v2_axisLine lineWeight="0"/>
+                                            <v2_axisLabels><style><CSS value="font-size:9pt;color:#1B1B1B"/></style></v2_axisLabels>
+                                          </v2_ordinalAxis>
+                                          <chartNodes>
+                                            <chartNode>
+                                              <chartNodeMembers>
+                                                <chartNodeMember refDataItem="Segment">
+                                                  <sortList><sortItem refDataItem="Sales CY" sortOrder="descending"/></sortList>
+                                                  <chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents>
+                                                </chartNodeMember>
+                                              </chartNodeMembers>
+                                            </chartNode>
+                                          </chartNodes>
+                                        </v2_commonAxis>
+                                        <v2_topLeftAxis>
+                                          <v2_combinationChartTypes>
+                                            <v2_bar>
+                                              <v2_solidPalette>
+                                                <v2_solidPaletteEntries>
+                                                  <v2_solidPaletteEntry><v2_fillEffect defaultColor="#29654B"/></v2_solidPaletteEntry>
+                                                  <v2_solidPaletteEntry><v2_fillEffect defaultColor="#C4CAEE"/></v2_solidPaletteEntry>
+                                                </v2_solidPaletteEntries>
+                                              </v2_solidPalette>
+                                              <chartNodes>
+                                                <chartNode>
+                                                  <chartNodeMembers>
+                                                    <chartNodeMember refDataItem="Sales CY">
+                                                      <chartContents><chartTextItem><dataSource><staticValue>This year</staticValue></dataSource></chartTextItem></chartContents>
+                                                    </chartNodeMember>
+                                                    <chartNodeMember refDataItem="Sales LY">
+                                                      <chartContents><chartTextItem><dataSource><staticValue>Last year</staticValue></dataSource></chartTextItem></chartContents>
+                                                    </chartNodeMember>
+                                                  </chartNodeMembers>
+                                                </chartNode>
+                                              </chartNodes>
+                                            </v2_bar>
+                                          </v2_combinationChartTypes>
+                                          <v2_axis>
+                                            <v2_axisLine lineWeight="0"/>
+                                            <v2_axisRange><v2_automaticRange/></v2_axisRange>
+                                            <v2_axisLabels>
+                                              <style>
+                                                <CSS value="font-size:8pt;color:#6B6B6B"/>
+                                                <dataFormat><currencyFormat currencyCode="USD" decimalSize="0" useGrouping="true" scale="-3"/></dataFormat>
+                                              </style>
+                                            </v2_axisLabels>
+                                            <v2_majorGridlines lineColor="#E6E4DF"/>
+                                          </v2_axis>
+                                        </v2_topLeftAxis>
+                                        <style><CSS value="width:276px;height:215px"/></style>
+                                      </v2_combinationChart>
+                                    </contents>
+                                  </tableCell>
+
+                                  <!-- Revenue by region -->
+                                  <tableCell>
+                                    <style><CSS value="width:293px;height:250px;background-color:#FFFFFF;border:1px solid #E6E4DF;padding:8px;vertical-align:top"/></style>
+                                    <contents>
+                                      <textItem>
+                                        <dataSource><staticValue>Revenue by region</staticValue></dataSource>
+                                        <style><CSS value="font-size:13pt;font-weight:bold;color:#29654B"/></style>
+                                      </textItem>
+                                      <v2_combinationChart name="chRegion" refQuery="qRegion" orientation="horizontal" maxHotspots="10000">
+                                        <v2_combinationTypeTooltips/>
+                                        <v2_legend>
+                                          <v2_legendPosition><v2_legendPreset position="topCenter"/></v2_legendPosition>
+                                          <style><CSS value="font-size:8pt;color:#6B6B6B"/></style>
+                                        </v2_legend>
+                                        <v2_commonAxis>
+                                          <v2_ordinalAxis>
+                                            <v2_axisLine lineWeight="0"/>
+                                            <v2_axisLabels><style><CSS value="font-size:9pt;color:#1B1B1B"/></style></v2_axisLabels>
+                                          </v2_ordinalAxis>
+                                          <chartNodes>
+                                            <chartNode>
+                                              <chartNodeMembers>
+                                                <chartNodeMember refDataItem="Region">
+                                                  <sortList><sortItem refDataItem="Sales CY" sortOrder="descending"/></sortList>
+                                                  <chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents>
+                                                </chartNodeMember>
+                                              </chartNodeMembers>
+                                            </chartNode>
+                                          </chartNodes>
+                                        </v2_commonAxis>
+                                        <v2_topLeftAxis>
+                                          <v2_combinationChartTypes>
+                                            <v2_bar>
+                                              <v2_solidPalette>
+                                                <v2_solidPaletteEntries>
+                                                  <v2_solidPaletteEntry><v2_fillEffect defaultColor="#29654B"/></v2_solidPaletteEntry>
+                                                  <v2_solidPaletteEntry><v2_fillEffect defaultColor="#C4CAEE"/></v2_solidPaletteEntry>
+                                                </v2_solidPaletteEntries>
+                                              </v2_solidPalette>
+                                              <chartNodes>
+                                                <chartNode>
+                                                  <chartNodeMembers>
+                                                    <chartNodeMember refDataItem="Sales CY">
+                                                      <chartContents><chartTextItem><dataSource><staticValue>This year</staticValue></dataSource></chartTextItem></chartContents>
+                                                    </chartNodeMember>
+                                                    <chartNodeMember refDataItem="Sales LY">
+                                                      <chartContents><chartTextItem><dataSource><staticValue>Last year</staticValue></dataSource></chartTextItem></chartContents>
+                                                    </chartNodeMember>
+                                                  </chartNodeMembers>
+                                                </chartNode>
+                                              </chartNodes>
+                                            </v2_bar>
+                                          </v2_combinationChartTypes>
+                                          <v2_axis>
+                                            <v2_axisLine lineWeight="0"/>
+                                            <v2_axisRange><v2_automaticRange/></v2_axisRange>
+                                            <v2_axisLabels>
+                                              <style>
+                                                <CSS value="font-size:8pt;color:#6B6B6B"/>
+                                                <dataFormat><currencyFormat currencyCode="USD" decimalSize="0" useGrouping="true" scale="-3"/></dataFormat>
+                                              </style>
+                                            </v2_axisLabels>
+                                            <v2_majorGridlines lineColor="#E6E4DF"/>
+                                          </v2_axis>
+                                        </v2_topLeftAxis>
+                                        <style><CSS value="width:277px;height:215px"/></style>
+                                      </v2_combinationChart>
+                                    </contents>
+                                  </tableCell>
+
+                                </tableCells>
+                              </tableRow>
+                            </tableRows>
+                          </table>
+
+                          <!-- ============ Row 3: Historical trends | Top 5 products ============ -->
+                          <table>
+                            <style><CSS value="width:100%;border-collapse:separate;border-spacing:5px 5px"/></style>
+                            <tableRows>
+                              <tableRow>
+                                <tableCells>
+
+                                  <!-- Historical trends (area) with Sales/Profit toggle -->
+                                  <tableCell>
+                                    <style><CSS value="width:640px;height:267px;background-color:#FFFFFF;border:1px solid #E6E4DF;padding:8px;vertical-align:top"/></style>
+                                    <contents>
+                                      <table>
+                                        <style><CSS value="width:100%;border-collapse:collapse"/></style>
+                                        <tableRows>
+                                          <tableRow>
+                                            <tableCells>
+                                              <tableCell>
+                                                <contents>
+                                                  <textItem>
+                                                    <dataSource><staticValue>Historical trends</staticValue></dataSource>
+                                                    <style><CSS value="font-size:13pt;font-weight:bold;color:#1B1B1B"/></style>
+                                                  </textItem>
+                                                </contents>
+                                              </tableCell>
+                                              <tableCell>
+                                                <style><CSS value="width:165px;text-align:right"/></style>
+                                                <contents>
+                                                  <selectValue name="promptMetric" parameter="pMetric" required="false"
+                                                               autoSubmit="true" selectValueUI="radioGroup" hideAdornments="true">
+                                                    <selectOptions>
+                                                      <selectOption useValue="1"><displayValue>Sales</displayValue></selectOption>
+                                                      <selectOption useValue="2"><displayValue>Profit</displayValue></selectOption>
+                                                    </selectOptions>
+                                                    <defaultSelections>
+                                                      <defaultSimpleSelection>1</defaultSimpleSelection>
+                                                    </defaultSelections>
+                                                    <style><CSS value="font-size:9pt;color:#29654B;background-color:#FBFAF8"/></style>
+                                                  </selectValue>
+                                                </contents>
+                                              </tableCell>
+                                            </tableCells>
+                                          </tableRow>
+                                        </tableRows>
+                                      </table>
+                                      <v2_combinationChart name="chTrend" refQuery="qTrend" maxHotspots="10000">
+                                        <v2_combinationTypeTooltips/>
+                                        <v2_commonAxis>
+                                          <v2_ordinalAxis>
+                                            <v2_axisLine lineWeight="0"/>
+                                            <v2_axisLabels><style><CSS value="font-size:8pt;color:#6B6B6B"/></style></v2_axisLabels>
+                                          </v2_ordinalAxis>
+                                          <chartNodes>
+                                            <chartNode>
+                                              <chartNodeMembers>
+                                                <chartNodeMember refDataItem="Year Month">
+                                                  <sortList><sortItem refDataItem="YearMonthSort" sortOrder="ascending"/></sortList>
+                                                  <chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents>
+                                                </chartNodeMember>
+                                              </chartNodeMembers>
+                                            </chartNode>
+                                          </chartNodes>
+                                        </v2_commonAxis>
+                                        <v2_topLeftAxis>
+                                          <v2_combinationChartTypes>
+                                            <v2_area>
+                                              <v2_solidPalette>
+                                                <v2_solidPaletteEntries>
+                                                  <v2_solidPaletteEntry><v2_fillEffect defaultColor="#29654B"/></v2_solidPaletteEntry>
+                                                </v2_solidPaletteEntries>
+                                              </v2_solidPalette>
+                                              <chartNodes>
+                                                <chartNode>
+                                                  <chartNodeMembers>
+                                                    <chartNodeMember refDataItem="Trend Value">
+                                                      <chartContents><chartTextItem><dataSource><dataItemLabel refDataItem="Trend Value"/></dataSource></chartTextItem></chartContents>
+                                                    </chartNodeMember>
+                                                  </chartNodeMembers>
+                                                </chartNode>
+                                              </chartNodes>
+                                            </v2_area>
+                                          </v2_combinationChartTypes>
+                                          <v2_axis>
+                                            <v2_axisLine lineWeight="0"/>
+                                            <v2_axisRange><v2_automaticRange/></v2_axisRange>
+                                            <v2_axisLabels>
+                                              <style>
+                                                <CSS value="font-size:8pt;color:#6B6B6B"/>
+                                                <dataFormat><currencyFormat currencyCode="USD" decimalSize="0" useGrouping="true" scale="-3"/></dataFormat>
+                                              </style>
+                                            </v2_axisLabels>
+                                            <v2_majorGridlines lineColor="#E6E4DF"/>
+                                          </v2_axis>
+                                        </v2_topLeftAxis>
+                                        <style><CSS value="width:620px;height:220px"/></style>
+                                      </v2_combinationChart>
+                                    </contents>
+                                  </tableCell>
+
+                                  <!-- Top 5 products -->
+                                  <tableCell>
+                                    <style><CSS value="width:525px;height:267px;background-color:#FFFFFF;border:1px solid #E6E4DF;padding:8px;vertical-align:top"/></style>
+                                    <contents>
+                                      <textItem>
+                                        <dataSource><staticValue>Top 5 products</staticValue></dataSource>
+                                        <style><CSS value="font-size:13pt;font-weight:bold;color:#1B1B1B"/></style>
+                                      </textItem>
+                                      <v2_combinationChart name="chTopProducts" refQuery="qTopProducts" orientation="horizontal" maxHotspots="10000">
+                                        <v2_combinationTypeTooltips/>
+                                        <v2_legend>
+                                          <v2_legendPosition><v2_legendPreset position="topCenter"/></v2_legendPosition>
+                                          <style><CSS value="font-size:8pt;color:#6B6B6B"/></style>
+                                        </v2_legend>
+                                        <v2_commonAxis>
+                                          <v2_ordinalAxis>
+                                            <v2_axisLine lineWeight="0"/>
+                                            <v2_axisLabels><style><CSS value="font-size:9pt;color:#1B1B1B"/></style></v2_axisLabels>
+                                          </v2_ordinalAxis>
+                                          <chartNodes>
+                                            <chartNode>
+                                              <chartNodeMembers>
+                                                <chartNodeMember refDataItem="Product">
+                                                  <sortList><sortItem refDataItem="Sales CY Top 5" sortOrder="descending"/></sortList>
+                                                  <chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents>
+                                                </chartNodeMember>
+                                              </chartNodeMembers>
+                                            </chartNode>
+                                          </chartNodes>
+                                        </v2_commonAxis>
+                                        <v2_topLeftAxis>
+                                          <v2_combinationChartTypes>
+                                            <v2_bar>
+                                              <v2_solidPalette>
+                                                <v2_solidPaletteEntries>
+                                                  <v2_solidPaletteEntry><v2_fillEffect defaultColor="#29654B"/></v2_solidPaletteEntry>
+                                                  <v2_solidPaletteEntry><v2_fillEffect defaultColor="#C4CAEE"/></v2_solidPaletteEntry>
+                                                </v2_solidPaletteEntries>
+                                              </v2_solidPalette>
+                                              <chartNodes>
+                                                <chartNode>
+                                                  <chartNodeMembers>
+                                                    <chartNodeMember refDataItem="Sales CY Top 5">
+                                                      <chartContents><chartTextItem><dataSource><staticValue>This year</staticValue></dataSource></chartTextItem></chartContents>
+                                                    </chartNodeMember>
+                                                    <chartNodeMember refDataItem="Sales LY Top 5">
+                                                      <chartContents><chartTextItem><dataSource><staticValue>Last year</staticValue></dataSource></chartTextItem></chartContents>
+                                                    </chartNodeMember>
+                                                  </chartNodeMembers>
+                                                </chartNode>
+                                              </chartNodes>
+                                            </v2_bar>
+                                          </v2_combinationChartTypes>
+                                          <v2_axis>
+                                            <v2_axisLine lineWeight="0"/>
+                                            <v2_axisRange><v2_automaticRange/></v2_axisRange>
+                                            <v2_axisLabels>
+                                              <style>
+                                                <CSS value="font-size:8pt;color:#6B6B6B"/>
+                                                <dataFormat><currencyFormat currencyCode="USD" decimalSize="0" useGrouping="true" scale="-3"/></dataFormat>
+                                              </style>
+                                            </v2_axisLabels>
+                                            <v2_majorGridlines lineColor="#E6E4DF"/>
+                                          </v2_axis>
+                                        </v2_topLeftAxis>
+                                        <style><CSS value="width:505px;height:230px"/></style>
+                                      </v2_combinationChart>
+                                    </contents>
+                                  </tableCell>
+
+                                </tableCells>
+                              </tableRow>
+                            </tableRows>
+                          </table>
+
+                        </contents>
+                      </tableCell>
+
+                    </tableCells>
+                  </tableRow>
+                </tableRows>
+              </table>
+
+            </contents>
+          </pageBody>
+        </page>
+      </reportPages>
+    </layout>
+  </layouts>
+
+  <XMLAttributes>
+    <XMLAttribute name="RS_CreateExtendedDataItems" value="true" output="no"/>
+    <XMLAttribute name="listSeparator" value="," output="no"/>
+    <XMLAttribute name="RS_modelModificationTime" value="2026-09-30T00:00:00.000Z" output="no"/>
+  </XMLAttributes>
+  <reportName>Sales Overview</reportName>
+</report>

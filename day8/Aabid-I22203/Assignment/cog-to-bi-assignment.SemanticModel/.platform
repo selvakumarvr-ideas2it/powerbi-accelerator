@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "cog-to-bi-assignment"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "44b1f5f5-d719-420d-9f52-a5a7c81ded42"
+  }
+}

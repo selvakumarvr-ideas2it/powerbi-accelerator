@@ -1,0 +1,46 @@
+table DimProduct
+	lineageTag: cb71e467-969f-463d-9d95-683257e32b5f
+
+	column ProductKey
+		dataType: string
+		lineageTag: aec98029-f55a-4835-ae49-bfa257cc5b05
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductName
+		dataType: string
+		lineageTag: 1032398c-10a5-4a96-96b2-04ea99c7bc80
+		summarizeBy: none
+		sourceColumn: ProductName
+
+	column ProductLine
+		dataType: string
+		lineageTag: 74229cb5-7bcf-4d2e-aba8-018564e39b93
+		summarizeBy: none
+		sourceColumn: ProductLine
+
+	column Category
+		dataType: string
+		lineageTag: 47fc2cf8-f592-4dcb-a6c8-4b1b214866c8
+		summarizeBy: none
+		sourceColumn: Category
+
+	partition DimProduct = m
+		mode: import
+		source =
+				let
+				  data = Table.FromRecords({
+				    [ProductKey=1, ProductName="Laptop Pro 15", ProductLine="Electronics", Category="Computers"],
+				    [ProductKey=2, ProductName="Wireless Mouse", ProductLine="Accessories", Category="Peripherals"],
+				    [ProductKey=3, ProductName="Mechanical Keyboard", ProductLine="Accessories", Category="Peripherals"],
+				    [ProductKey=4, ProductName="USB-C Hub", ProductLine="Accessories", Category="Connectivity"],
+				    [ProductKey=5, ProductName="Monitor 4K 27in", ProductLine="Electronics", Category="Displays"],
+				    [ProductKey=6, ProductName="Webcam HD", ProductLine="Accessories", Category="Peripherals"],
+				    [ProductKey=7, ProductName="Laptop Stand", ProductLine="Accessories", Category="Ergonomics"],
+				    [ProductKey=8, ProductName="Desk Lamp LED", ProductLine="Accessories", Category="Office"]
+				  })
+				in
+				  data
+

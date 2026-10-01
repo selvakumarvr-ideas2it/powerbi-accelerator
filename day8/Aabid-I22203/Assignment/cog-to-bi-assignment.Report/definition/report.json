@@ -1,0 +1,50 @@
+{
+  "settings": {
+    "useStylableVisualContainerHeader": true,
+    "defaultDrillFilterOtherVisuals": true,
+    "exportDataMode": "AllowSummarized",
+    "allowChangeFilterTypes": true,
+    "useDefaultAggregateDisplayName": true,
+    "useEnhancedTooltips": true
+  },
+  "objects": {
+    "section": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Top'"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.3.0/schema.json",
+  "themeCollection": {
+    "baseTheme": {
+      "name": "Fluent2-CY26SU08",
+      "type": "SharedResources",
+      "reportVersionAtImport": {
+        "page": "2.3.1",
+        "visual": "2.12.0",
+        "report": "3.4.0"
+      }
+    }
+  },
+  "resourcePackages": [
+    {
+      "name": "SharedResources",
+      "items": [
+        {
+          "path": "BaseThemes/Fluent2-CY26SU08.json",
+          "name": "Fluent2-CY26SU08",
+          "type": "BaseTheme"
+        }
+      ],
+      "type": "SharedResources"
+    }
+  ]
+}

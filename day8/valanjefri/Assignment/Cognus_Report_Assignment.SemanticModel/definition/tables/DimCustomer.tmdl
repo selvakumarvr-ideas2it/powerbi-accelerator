@@ -1,0 +1,40 @@
+/// Cognos query subject DimCustomer. RegionKey is the customer's HOME region and is deliberately NOT related to DimRegion (per the XML notes).
+table DimCustomer
+	lineageTag: a6a71a6d-c9dc-4dae-8096-33a3c23d6b34
+
+	column CustomerKey
+		dataType: int64
+		isHidden
+		lineageTag: a967b888-aa0b-476b-ba07-fd38b330418c
+		summarizeBy: none
+		sourceColumn: CustomerKey
+
+	column CustomerName
+		dataType: string
+		lineageTag: 21027ec7-5174-4b0c-95ec-158cce298711
+		summarizeBy: none
+		sourceColumn: CustomerName
+
+	column Segment
+		dataType: string
+		lineageTag: 084b0ff4-baa5-412c-bdc9-bdff2cfa1721
+		summarizeBy: none
+		sourceColumn: Segment
+
+	column RegionKey
+		dataType: int64
+		isHidden
+		lineageTag: 6a57b28c-75fd-41f9-83a0-a9fc1fd2f5de
+		summarizeBy: none
+		sourceColumn: RegionKey
+
+	partition DimCustomer = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents(DataFolder & "\DimCustomer.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				  Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  Typed = Table.TransformColumnTypes(Promoted, {{"CustomerKey", Int64.Type}, {"CustomerName", type text}, {"Segment", type text}, {"RegionKey", Int64.Type}})
+				in
+				  Typed
+

@@ -1,0 +1,34 @@
+/// Cognos query subject DimSalesperson. RegionKey is the salesperson's HOME region and is deliberately NOT related to DimRegion.
+table DimSalesperson
+	lineageTag: e17adebd-a0cc-4908-aa07-0f5919fb5256
+
+	column SalespersonKey
+		dataType: int64
+		isHidden
+		lineageTag: 8c763923-f74f-4c69-b7fe-995fdbdda923
+		summarizeBy: none
+		sourceColumn: SalespersonKey
+
+	column Salesperson
+		dataType: string
+		lineageTag: b9329ca0-a9fc-47b1-8731-94dad764ecb6
+		summarizeBy: none
+		sourceColumn: Salesperson
+
+	column RegionKey
+		dataType: int64
+		isHidden
+		lineageTag: 3953cff5-1a71-4341-8ab7-c66d183518fd
+		summarizeBy: none
+		sourceColumn: RegionKey
+
+	partition DimSalesperson = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents(DataFolder & "\DimSalesperson.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				  Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  Typed = Table.TransformColumnTypes(Promoted, {{"SalespersonKey", Int64.Type}, {"Salesperson", type text}, {"RegionKey", Int64.Type}})
+				in
+				  Typed
+

@@ -1,0 +1,6 @@
+/// Folder holding the Cognos source CSVs (FactSales, DimDate, DimCustomer, DimProduct, DimRegion, DimSalesperson). Change to repoint all tables.
+expression DataFolder = "C:\Users\charan.lingeswaran\Music\power bi\Healthcare\Visualization\Day 8\Assignment\claude-powerbi.Cognos" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: 82458c48-6b68-4244-8cb9-8412c8d20f26
+
+	annotation PBI_ResultType = Text
+

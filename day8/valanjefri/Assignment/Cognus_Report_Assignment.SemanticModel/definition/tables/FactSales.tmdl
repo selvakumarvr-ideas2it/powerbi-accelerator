@@ -1,0 +1,227 @@
+/// Cognos query subject FactSales (1,500 rows). Amount columns are fixed-decimal; ProfitAmount is used exactly as supplied.
+table FactSales
+	lineageTag: 983850ae-d65d-40b8-9b52-eb1b7e640a9f
+
+	/// Cognos prompt pYear (integer, default 2026) -> slicer on pYear[Year]; falls back to 2026 when nothing is selected.
+	measure 'Selected Year' = SELECTEDVALUE(pYear[Year], 2026)
+		formatString: 0
+		displayFolder: Parameters
+		lineageTag: 9b4873c9-751f-4b8a-9147-d737e9e6d127
+
+	/// Cognos prompt pMetric (1 = Sales, 2 = Profit, default 1) -> slicer on 'Trend Metric'.
+	measure 'Selected Metric' = SELECTEDVALUE('Trend Metric'[MetricID], 1)
+		formatString: 0
+		displayFolder: Parameters
+		lineageTag: ffe5876d-9bd0-45b4-9056-cb4c86906279
+
+	/// Cognos: total(case when [DimDate].[Year] = pYear then [FactSales].[SalesAmount] end)
+	measure 'Sales CY' =
+			VAR y = [Selected Year]
+			RETURN CALCULATE(SUM(FactSales[SalesAmount]), DimDate[Year] = y)
+		formatString: $#,0
+		displayFolder: Current Year
+		lineageTag: 2a2eac40-6beb-4915-996c-aa849f701b36
+
+	/// Cognos: total(case when [DimDate].[Year] = pYear - 1 then [FactSales].[SalesAmount] end)
+	measure 'Sales LY' =
+			VAR y = [Selected Year]
+			RETURN CALCULATE(SUM(FactSales[SalesAmount]), DimDate[Year] = y - 1)
+		formatString: $#,0
+		displayFolder: Last Year
+		lineageTag: a19f6b00-c653-4faf-8975-300c41de6a75
+
+	/// Cognos: total(case when Year = pYear then [FactSales].[ProfitAmount] end)
+	measure 'Profit CY' =
+			VAR y = [Selected Year]
+			RETURN CALCULATE(SUM(FactSales[ProfitAmount]), DimDate[Year] = y)
+		formatString: $#,0
+		displayFolder: Current Year
+		lineageTag: 47c9111e-3076-4d83-b088-a839f3c0e546
+
+	/// Cognos: total(case when Year = pYear - 1 then [FactSales].[ProfitAmount] end)
+	measure 'Profit LY' =
+			VAR y = [Selected Year]
+			RETURN CALCULATE(SUM(FactSales[ProfitAmount]), DimDate[Year] = y - 1)
+		formatString: $#,0
+		displayFolder: Last Year
+		lineageTag: 830e1c10-d9f9-4f30-8cc9-b01061c1d950
+
+	/// Cognos: total(case when Year = pYear then [FactSales].[CostAmount] end)
+	measure 'Cost CY' =
+			VAR y = [Selected Year]
+			RETURN CALCULATE(SUM(FactSales[CostAmount]), DimDate[Year] = y)
+		formatString: $#,0
+		displayFolder: Current Year
+		lineageTag: 560b6612-bbd3-4525-8971-750e95a3172d
+
+	/// Cognos: total(case when Year = pYear - 1 then [FactSales].[CostAmount] end)
+	measure 'Cost LY' =
+			VAR y = [Selected Year]
+			RETURN CALCULATE(SUM(FactSales[CostAmount]), DimDate[Year] = y - 1)
+		formatString: $#,0
+		displayFolder: Last Year
+		lineageTag: 0e0fca47-4719-4b3f-83e4-1d55c1e1aa32
+
+	/// Cognos: [Profit CY] / nullif([Sales CY], 0). DIVIDE returns BLANK when the denominator is 0 or blank.
+	measure 'Margin CY' = DIVIDE([Profit CY], [Sales CY])
+		formatString: 0.0%
+		displayFolder: Current Year
+		lineageTag: 7326c607-b698-4023-ae47-e2738f866575
+
+	/// Cognos: [Profit LY] / nullif([Sales LY], 0)
+	measure 'Margin LY' = DIVIDE([Profit LY], [Sales LY])
+		formatString: 0.0%
+		displayFolder: Last Year
+		lineageTag: 44ce389c-545f-4a23-a5cb-84a1b34e8d25
+
+	/// Cognos: ([Sales CY] - [Sales LY]) / nullif([Sales LY], 0). Blank when either year is blank, to mirror Cognos NULL arithmetic.
+	measure 'Sales YoY' = IF(ISBLANK([Sales CY]) || ISBLANK([Sales LY]), BLANK(), DIVIDE([Sales CY] - [Sales LY], [Sales LY]))
+		formatString: +0.00%;-0.00%;0.00%
+		displayFolder: Year over Year
+		lineageTag: 1f36a6c9-efd9-4096-892f-361a21648ac5
+
+	/// Cognos: ([Profit CY] - [Profit LY]) / nullif([Profit LY], 0)
+	measure 'Profit YoY' = IF(ISBLANK([Profit CY]) || ISBLANK([Profit LY]), BLANK(), DIVIDE([Profit CY] - [Profit LY], [Profit LY]))
+		formatString: +0.00%;-0.00%;0.00%
+		displayFolder: Year over Year
+		lineageTag: 85c8478e-33bb-4d14-b08c-fb99ba275ce0
+
+	/// Cognos: ([Cost CY] - [Cost LY]) / nullif([Cost LY], 0)
+	measure 'Cost YoY' = IF(ISBLANK([Cost CY]) || ISBLANK([Cost LY]), BLANK(), DIVIDE([Cost CY] - [Cost LY], [Cost LY]))
+		formatString: +0.00%;-0.00%;0.00%
+		displayFolder: Year over Year
+		lineageTag: 21abc95d-429c-458d-8f09-4b95ff3655de
+
+	/// Cognos: ([Margin CY] - [Margin LY]) * 100 (percentage points)
+	measure 'Margin YoY pts' = IF(ISBLANK([Margin CY]) || ISBLANK([Margin LY]), BLANK(), ([Margin CY] - [Margin LY]) * 100)
+		formatString: +0.0;-0.0;0.0
+		displayFolder: Year over Year
+		lineageTag: 2ae5443a-f1dd-4122-a3ff-68471671b2ef
+
+	/// Cognos data format: +0.00%;-0.00%, missing value shows n/a
+	measure 'Sales YoY Label' = IF(ISBLANK([Sales YoY]), "n/a", FORMAT([Sales YoY], "+0.00%;-0.00%;0.00%"))
+		displayFolder: Labels
+		lineageTag: 73163e58-ab72-4dc8-8705-50c26dc3eb8a
+
+	/// Cognos data format: +0.00%;-0.00%, missing value shows n/a
+	measure 'Profit YoY Label' = IF(ISBLANK([Profit YoY]), "n/a", FORMAT([Profit YoY], "+0.00%;-0.00%;0.00%"))
+		displayFolder: Labels
+		lineageTag: 87c81633-eb7c-49d7-9af1-a7a21f8d1ac6
+
+	/// Cognos data format: +0.00%;-0.00%, missing value shows n/a
+	measure 'Cost YoY Label' = IF(ISBLANK([Cost YoY]), "n/a", FORMAT([Cost YoY], "+0.00%;-0.00%;0.00%"))
+		displayFolder: Labels
+		lineageTag: 90f8a678-f2b2-4829-86e9-f752fd56d25e
+
+	/// Cognos data format: +0.0 pts;-0.0 pts, missing value shows n/a
+	measure 'Margin YoY Label' = IF(ISBLANK([Margin YoY pts]), "n/a", FORMAT([Margin YoY pts], "+0.0;-0.0;0.0") & " pts")
+		displayFolder: Labels
+		lineageTag: 13fdd3f7-8fed-4a42-ba62-7a365500cf95
+
+	/// Cognos: 'Fiscal year ' || cast(pYear, varchar(4)) || '  ·  compared with ' || cast(pYear - 1, varchar(4))
+	measure 'Header Subtitle' = "Fiscal year " & [Selected Year] & "  ·  compared with " & ([Selected Year] - 1)
+		displayFolder: Labels
+		lineageTag: cc77f3b5-f54c-450f-9e93-aeeb48955b9c
+
+	/// Cognos: case when pMetric = 2 then ProfitAmount else SalesAmount end, restricted to Year between pYear-1 and pYear.
+	measure 'Trend Value' =
+			VAR y = [Selected Year]
+			VAR m = [Selected Metric]
+			RETURN
+			    CALCULATE(
+			        IF(m = 2, SUM(FactSales[ProfitAmount]), SUM(FactSales[SalesAmount])),
+			        FILTER(ALL(DimDate[Year]), DimDate[Year] >= y - 1 && DimDate[Year] <= y)
+			    )
+		formatString: $#,0
+		displayFolder: Trend
+		lineageTag: 47f401fd-342f-4e14-8f1a-cf0911a17bbd
+
+	/// Cognos: rank([Sales CY Top 5]); ties share a rank and the next rank is skipped (RANKX Skip).
+	measure 'Sales Rank' = IF(ISBLANK([Sales CY]), BLANK(), RANKX(ALL(DimProduct[Product]), [Sales CY], , DESC, Skip))
+		formatString: 0
+		displayFolder: Ranking
+		lineageTag: 0a479802-d9fc-4292-a89e-07f07f9ada51
+
+	/// Added for the drill-through page header (not in the Cognos XML): the product currently in context.
+	measure 'Selected Product' = SELECTEDVALUE(DimProduct[Product], "All products")
+		displayFolder: Labels
+
+	column SalesID
+		dataType: string
+		lineageTag: 69a09267-ab5f-421d-9d6f-07d4e0c7d318
+		summarizeBy: none
+		sourceColumn: SalesID
+
+	column DateKey
+		dataType: int64
+		isHidden
+		lineageTag: a6693561-98fb-443c-b550-cc1568e5fcff
+		summarizeBy: none
+		sourceColumn: DateKey
+
+	column CustomerKey
+		dataType: int64
+		isHidden
+		lineageTag: b580faf1-890b-41ea-9549-ca6bf98d48cb
+		summarizeBy: none
+		sourceColumn: CustomerKey
+
+	column ProductKey
+		dataType: int64
+		isHidden
+		lineageTag: ef2ccf05-8206-4f1e-b7cd-6f89a299f733
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+	column SalespersonKey
+		dataType: int64
+		isHidden
+		lineageTag: bd4e72c8-ba6e-4ea8-9d16-208a4992b74b
+		summarizeBy: none
+		sourceColumn: SalespersonKey
+
+	column RegionKey
+		dataType: int64
+		isHidden
+		lineageTag: 63b1da57-12fb-48b7-9891-b1a1de2aeade
+		summarizeBy: none
+		sourceColumn: RegionKey
+
+	column Quantity
+		dataType: int64
+		formatString: #,0
+		lineageTag: a6f2d929-8fe2-4ffa-a3a0-0b4fcc618858
+		summarizeBy: none
+		sourceColumn: Quantity
+
+	column SalesAmount
+		dataType: decimal
+		formatString: $#,0.00
+		lineageTag: faf88471-eb18-4ca0-a556-aeadbb7dd1f1
+		summarizeBy: none
+		sourceColumn: SalesAmount
+
+	column CostAmount
+		dataType: decimal
+		formatString: $#,0.00
+		lineageTag: 2c2fdbde-8013-4b43-ab7b-77b5fab70e94
+		summarizeBy: none
+		sourceColumn: CostAmount
+
+	column ProfitAmount
+		dataType: decimal
+		formatString: $#,0.00
+		lineageTag: 516e8efa-7eb5-448a-9b61-3404cef9d086
+		summarizeBy: none
+		sourceColumn: ProfitAmount
+
+	partition FactSales = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents(DataFolder & "\FactSales.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				  Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  Typed = Table.TransformColumnTypes(Promoted, {{"SalesID", type text}, {"DateKey", Int64.Type}, {"CustomerKey", Int64.Type}, {"ProductKey", Int64.Type}, {"SalespersonKey", Int64.Type}, {"RegionKey", Int64.Type}, {"Quantity", Int64.Type}, {"SalesAmount", Currency.Type}, {"CostAmount", Currency.Type}, {"ProfitAmount", Currency.Type}}, "en-US")
+				in
+				  Typed
+

@@ -1,0 +1,33 @@
+/// Cognos query subject DimProduct.
+table DimProduct
+	lineageTag: 68fe2c17-ab28-4a4a-9934-752ef983c09d
+
+	column ProductKey
+		dataType: int64
+		isHidden
+		lineageTag: a30e0c1b-1d19-4c24-8c53-a4ae98ed299f
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+	column Product
+		dataType: string
+		lineageTag: 0fe924f7-80c6-472c-85cd-f1f0314acfa0
+		summarizeBy: none
+		sourceColumn: Product
+
+	column Category
+		dataType: string
+		lineageTag: 2d10529b-c8ce-4984-9696-35a9e27de666
+		summarizeBy: none
+		sourceColumn: Category
+
+	partition DimProduct = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents(DataFolder & "\DimProduct.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				  Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  Typed = Table.TransformColumnTypes(Promoted, {{"ProductKey", Int64.Type}, {"Product", type text}, {"Category", type text}})
+				in
+				  Typed
+

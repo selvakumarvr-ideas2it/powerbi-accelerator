@@ -1,0 +1,16 @@
+{
+  "name": "Forest Lavender",
+  "dataColors": [
+    "#29654B",
+    "#C4CAEE",
+    "#E3F42A",
+    "#1B3D2E",
+    "#8FA6D8",
+    "#6B6B6B",
+    "#A8C8B5",
+    "#4F46A5"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#1B1B1B",
+  "tableAccent": "#29654B"
+}

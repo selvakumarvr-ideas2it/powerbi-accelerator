@@ -1,0 +1,22 @@
+/// Disconnected table replacing Cognos prompt pYear (default 2026). Values come from DimDate.csv (qYears query). Not related to any table by design.
+table pYear
+	lineageTag: 0a9c98cc-8370-44d8-88c3-8b9df730ccc5
+
+	column Year
+		dataType: int64
+		lineageTag: e691dbb5-9ee3-4693-a018-4feb23442f8d
+		summarizeBy: none
+		sourceColumn: Year
+
+	partition pYear = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents(DataFolder & "\DimDate.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				  Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  Years = Table.Distinct(Table.SelectColumns(Promoted, {"Year"})),
+				  Typed = Table.TransformColumnTypes(Years, {{"Year", Int64.Type}}),
+				  Sorted = Table.Sort(Typed, {{"Year", Order.Descending}})
+				in
+				  Sorted
+

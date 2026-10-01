@@ -1,0 +1,24 @@
+relationship FactClaims_DimDate
+	fromColumn: FactClaims.DateKey
+	toColumn: DimDate.DateKey
+
+relationship FactClaims_DimMember
+	fromColumn: FactClaims.MemberKey
+	toColumn: DimMember.MemberKey
+
+relationship FactClaims_DimProvider
+	fromColumn: FactClaims.ProviderKey
+	toColumn: DimProvider.ProviderKey
+
+relationship FactClaims_DimPayer
+	fromColumn: FactClaims.PayerKey
+	toColumn: DimPayer.PayerKey
+
+relationship FactRevenue_DimDate
+	fromColumn: FactRevenue.DateKey
+	toColumn: DimDate.DateKey
+
+relationship FactRevenue_DimPayer
+	fromColumn: FactRevenue.PayerKey
+	toColumn: DimPayer.PayerKey
+

@@ -1,0 +1,93 @@
+table DimMember
+	lineageTag: a819733a-00a4-4d87-9e74-a719928da6dc
+
+	column MemberKey
+		dataType: int64
+		isHidden
+		lineageTag: 11dc7eff-5d82-488b-9be6-cef2c20f631b
+		summarizeBy: none
+		sourceColumn: MemberKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column MemberID
+		dataType: string
+		lineageTag: cbb6e87a-0c8a-4fa7-bed0-16d200971552
+		summarizeBy: none
+		sourceColumn: MemberID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Age
+		dataType: int64
+		lineageTag: a587d1d7-8575-4cfd-92c5-dbd649ecc454
+		summarizeBy: none
+		sourceColumn: Age
+
+		annotation SummarizationSetBy = Automatic
+
+	column Gender
+		dataType: string
+		isHidden
+		lineageTag: effcc5f2-c2df-4e18-b06e-4b7bea77712e
+		summarizeBy: none
+		sourceColumn: Gender
+
+		annotation SummarizationSetBy = Automatic
+
+	column PlanType
+		dataType: string
+		lineageTag: dd4a6b44-ee62-4b91-8f1a-23c75fb4064e
+		summarizeBy: none
+		sourceColumn: PlanType
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: 22dfea92-8c52-46e2-b9b5-b150b767541e
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Age Band' = SWITCH(TRUE(), DimMember[Age] < 35, "18-34", DimMember[Age] < 50, "35-49", DimMember[Age] < 65, "50-64", "65+")
+		dataType: string
+		lineageTag: 5ae9a2d9-3233-4701-b0a8-b8387ad06a47
+		summarizeBy: none
+		sortByColumn: 'Age Band Sort'
+
+	column 'Age Band Sort' = SWITCH(TRUE(), DimMember[Age] < 35, 1, DimMember[Age] < 50, 2, DimMember[Age] < 65, 3, 4)
+		dataType: int64
+		isHidden
+		lineageTag: f3875c33-abeb-4d09-a151-815e38670b3d
+		summarizeBy: none
+
+	column 'Gender Desc' = IF(DimMember[Gender] = "F", "Female", "Male")
+		dataType: string
+		lineageTag: abf1c639-5c5a-4b1b-a705-d8467578ed0f
+		summarizeBy: none
+
+	hierarchy Geography
+		lineageTag: 038f6698-9660-4405-8f39-8d81ec7b13f3
+
+		level 'Plan Type'
+			lineageTag: 95115331-9f47-490a-9cd3-22e9396146f3
+			column: PlanType
+
+		level State
+			lineageTag: fdc4c037-3dff-4674-93f9-5b2bed0af5ee
+			column: State
+
+	partition DimMember = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\\malik\\power bi traning\\powerbi-accelerator\\cog-to-bi-asgnmt\\day-6\\data\\DimMember.csv"),[Delimiter=",", Columns=6, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"MemberKey", Int64.Type}, {"MemberID", type text}, {"Age", Int64.Type}, {"Gender", type text}, {"PlanType", type text}, {"State", type text}}, "en-US")
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Optum-Healthcare-Insights"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "89428b6a-f0d7-4297-a0c0-06ffc349c333"
+  }
+}

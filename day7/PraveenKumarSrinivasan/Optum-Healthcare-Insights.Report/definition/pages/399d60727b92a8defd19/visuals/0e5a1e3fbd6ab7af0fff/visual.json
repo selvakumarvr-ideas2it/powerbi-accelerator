@@ -1,0 +1,301 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "0e5a1e3fbd6ab7af0fff",
+  "position": {
+    "x": 15,
+    "y": 465,
+    "z": 17000,
+    "height": 249,
+    "width": 1250,
+    "tabOrder": 17000
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimProvider"
+                    }
+                  },
+                  "Property": "Specialty"
+                }
+              },
+              "queryRef": "DimProvider.Specialty",
+              "nativeQueryRef": "Specialty",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimProvider"
+                    }
+                  },
+                  "Property": "ProviderName"
+                }
+              },
+              "queryRef": "DimProvider.ProviderName",
+              "nativeQueryRef": "ProviderName",
+              "active": false
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Total Claims"
+                }
+              },
+              "queryRef": "_Measures.Total Claims",
+              "nativeQueryRef": "Total Claims"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Billed Amount"
+                }
+              },
+              "queryRef": "_Measures.Billed Amount",
+              "nativeQueryRef": "Billed Amount"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Allowed Amount"
+                }
+              },
+              "queryRef": "_Measures.Allowed Amount",
+              "nativeQueryRef": "Allowed Amount"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Paid Amount"
+                }
+              },
+              "queryRef": "_Measures.Paid Amount",
+              "nativeQueryRef": "Paid Amount"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Avg Paid per Claim"
+                }
+              },
+              "queryRef": "_Measures.Avg Paid per Claim",
+              "nativeQueryRef": "Avg Paid per Claim"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Allowed to Billed %"
+                }
+              },
+              "queryRef": "_Measures.Allowed to Billed %",
+              "nativeQueryRef": "Allowed to Billed %"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Paid Amount YoY %"
+                }
+              },
+              "queryRef": "_Measures.Paid Amount YoY %",
+              "nativeQueryRef": "Paid Amount YoY %"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Claims Detail by Specialty > Provider (right-click a provider to drill through)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "06d58bd2ced60206dc5b",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimProvider"
+              }
+            },
+            "Property": "Specialty"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "01313e8e73384c29b36b",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimProvider"
+              }
+            },
+            "Property": "ProviderName"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "017beddf91a033a5e3f7",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Total Claims"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "b7b672daba753021ac24",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Billed Amount"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "8603ea2fa09d89411143",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Allowed Amount"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "78973bfcc5c671d4ca5d",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Paid Amount"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "c5ac222317ff216d50ae",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Avg Paid per Claim"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "61c588cf305c5a74412a",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Allowed to Billed %"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "3ce43cb7b1a93aa7d5ef",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Paid Amount YoY %"
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
+  }
+}

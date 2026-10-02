@@ -1,0 +1,29 @@
+table DimRegion
+	lineageTag: e6h57fe4-ebi1-6h6d-f84g-cg7h6a7fk12f
+
+	column RegionKey
+		dataType: string
+		lineageTag: f77c2f92-fhj2-7i7e-ga5h-dh8i7b8gl23g
+		summarizeBy: none
+		sourceColumn: RegionKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: g88d3ga3-gik3-8j8f-hb6i-ei9j8c9hm34h
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Partition1 = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents("C:\\malik\\power bi traning\\powerbi-accelerator\\cog-to-bi-asgnmt\\data\\DimRegion.csv"),[Delimiter=",", Columns=2, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				  #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				  #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"RegionKey", type text}, {"Region", type text}})
+				in
+				  #"Changed Type"
+

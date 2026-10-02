@@ -1,0 +1,45 @@
+table DimCustomer
+	lineageTag: c4f35dc2-c9d9-4f4b-d62e-ae5d482gh96d
+
+	column CustomerKey
+		dataType: string
+		lineageTag: d77b0d68-48g6-5261-c479-1f9f583gf2g0
+		summarizeBy: none
+		sourceColumn: CustomerKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomerName
+		dataType: string
+		lineageTag: e88c1e79-59h7-6372-d58a-2gag694hg3h1
+		summarizeBy: none
+		sourceColumn: CustomerName
+
+		annotation SummarizationSetBy = Automatic
+
+	column Segment
+		dataType: string
+		lineageTag: f99d2f8a-6ai8-74ha-e69b-3hbh7a5ih4i2
+		summarizeBy: none
+		sourceColumn: Segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column RegionKey
+		dataType: string
+		lineageTag: gaa0e3gb-7bj9-85ib-f7ac-4iciah6ji5j3
+		summarizeBy: none
+		sourceColumn: RegionKey
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Partition1 = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents("C:\\malik\\power bi traning\\powerbi-accelerator\\cog-to-bi-asgnmt\\data\\DimCustomer.csv"),[Delimiter=",", Columns=4, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				  #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				  #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"CustomerKey", type text}, {"CustomerName", type text}, {"Segment", type text}, {"RegionKey", type text}})
+				in
+				  #"Changed Type"
+

@@ -1,0 +1,37 @@
+table DimProduct
+	lineageTag: d5g46ed3-dah0-5g5c-e73f-bf6g596ej01e
+
+	column ProductKey
+		dataType: string
+		lineageTag: e66b1e81-egi1-6h6d-f84g-cg7h6a7fk12f
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product
+		dataType: string
+		lineageTag: f77c2f92-fhj2-7i7e-ga5h-dh8i7b8gl23g
+		summarizeBy: none
+		sourceColumn: Product
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		lineageTag: g88d3ga3-gik3-8j8f-hb6i-ei9j8c9hm34h
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Partition1 = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents("C:\\malik\\power bi traning\\powerbi-accelerator\\cog-to-bi-asgnmt\\data\\DimProduct.csv"),[Delimiter=",", Columns=3, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				  #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				  #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"ProductKey", type text}, {"Product", type text}, {"Category", type text}})
+				in
+				  #"Changed Type"
+

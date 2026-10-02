@@ -1,0 +1,187 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "731f47aad0dc6bf5f66c",
+  "position": {
+    "x": 850,
+    "y": 465,
+    "z": 17000,
+    "height": 249,
+    "width": 415,
+    "tabOrder": 17000
+  },
+  "visual": {
+    "visualType": "scatterChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimProvider"
+                    }
+                  },
+                  "Property": "ProviderName"
+                }
+              },
+              "queryRef": "DimProvider.ProviderName",
+              "nativeQueryRef": "ProviderName",
+              "active": true
+            }
+          ]
+        },
+        "Series": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimProvider"
+                    }
+                  },
+                  "Property": "NetworkStatus"
+                }
+              },
+              "queryRef": "DimProvider.NetworkStatus",
+              "nativeQueryRef": "NetworkStatus"
+            }
+          ]
+        },
+        "X": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Total Claims"
+                }
+              },
+              "queryRef": "_Measures.Total Claims",
+              "nativeQueryRef": "Total Claims",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Avg Paid per Claim"
+                }
+              },
+              "queryRef": "_Measures.Avg Paid per Claim",
+              "nativeQueryRef": "Avg Paid per Claim"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "DimProvider"
+                  }
+                },
+                "Property": "ProviderName"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Claim Volume vs Cost per Claim by Provider'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "f70a777891032b9262cc",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimProvider"
+              }
+            },
+            "Property": "ProviderName"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "e057517165523443fa14",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Total Claims"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "5cc865f1d3feba34bc14",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Avg Paid per Claim"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "be33ce7b416db0c080e8",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimProvider"
+              }
+            },
+            "Property": "NetworkStatus"
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
+  }
+}

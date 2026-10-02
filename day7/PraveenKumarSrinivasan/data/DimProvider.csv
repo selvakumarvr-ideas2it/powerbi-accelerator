@@ -1,0 +1,61 @@
+ProviderKey,ProviderID,ProviderName,Specialty,NetworkStatus
+1,PR00001,Provider Group 01,Primary Care,In Network
+2,PR00002,Provider Group 02,Cardiology,In Network
+3,PR00003,Provider Group 03,Primary Care,In Network
+4,PR00004,Provider Group 04,Behavioral Health,In Network
+5,PR00005,Provider Group 05,Oncology,In Network
+6,PR00006,Provider Group 06,Oncology,In Network
+7,PR00007,Provider Group 07,Emergency,In Network
+8,PR00008,Provider Group 08,Oncology,In Network
+9,PR00009,Provider Group 09,Orthopedics,In Network
+10,PR00010,Provider Group 10,Orthopedics,Out of Network
+11,PR00011,Provider Group 11,Emergency,In Network
+12,PR00012,Provider Group 12,Behavioral Health,In Network
+13,PR00013,Provider Group 13,Primary Care,In Network
+14,PR00014,Provider Group 14,Behavioral Health,In Network
+15,PR00015,Provider Group 15,Orthopedics,Out of Network
+16,PR00016,Provider Group 16,Emergency,Out of Network
+17,PR00017,Provider Group 17,Emergency,In Network
+18,PR00018,Provider Group 18,Oncology,In Network
+19,PR00019,Provider Group 19,Primary Care,In Network
+20,PR00020,Provider Group 20,Behavioral Health,In Network
+21,PR00021,Provider Group 21,Oncology,In Network
+22,PR00022,Provider Group 22,Behavioral Health,In Network
+23,PR00023,Provider Group 23,Primary Care,In Network
+24,PR00024,Provider Group 24,Primary Care,In Network
+25,PR00025,Provider Group 25,Primary Care,In Network
+26,PR00026,Provider Group 26,Behavioral Health,In Network
+27,PR00027,Provider Group 27,Primary Care,In Network
+28,PR00028,Provider Group 28,Emergency,In Network
+29,PR00029,Provider Group 29,Orthopedics,In Network
+30,PR00030,Provider Group 30,Emergency,In Network
+31,PR00031,Provider Group 31,Cardiology,In Network
+32,PR00032,Provider Group 32,Oncology,Out of Network
+33,PR00033,Provider Group 33,Cardiology,In Network
+34,PR00034,Provider Group 34,Behavioral Health,In Network
+35,PR00035,Provider Group 35,Primary Care,In Network
+36,PR00036,Provider Group 36,Oncology,In Network
+37,PR00037,Provider Group 37,Orthopedics,In Network
+38,PR00038,Provider Group 38,Oncology,In Network
+39,PR00039,Provider Group 39,Emergency,Out of Network
+40,PR00040,Provider Group 40,Emergency,Out of Network
+41,PR00041,Provider Group 41,Emergency,In Network
+42,PR00042,Provider Group 42,Primary Care,In Network
+43,PR00043,Provider Group 43,Cardiology,Out of Network
+44,PR00044,Provider Group 44,Orthopedics,In Network
+45,PR00045,Provider Group 45,Oncology,In Network
+46,PR00046,Provider Group 46,Emergency,In Network
+47,PR00047,Provider Group 47,Cardiology,In Network
+48,PR00048,Provider Group 48,Primary Care,In Network
+49,PR00049,Provider Group 49,Cardiology,In Network
+50,PR00050,Provider Group 50,Cardiology,In Network
+51,PR00051,Provider Group 51,Primary Care,In Network
+52,PR00052,Provider Group 52,Orthopedics,In Network
+53,PR00053,Provider Group 53,Orthopedics,In Network
+54,PR00054,Provider Group 54,Emergency,In Network
+55,PR00055,Provider Group 55,Cardiology,In Network
+56,PR00056,Provider Group 56,Emergency,Out of Network
+57,PR00057,Provider Group 57,Behavioral Health,In Network
+58,PR00058,Provider Group 58,Emergency,In Network
+59,PR00059,Provider Group 59,Cardiology,In Network
+60,PR00060,Provider Group 60,Behavioral Health,In Network

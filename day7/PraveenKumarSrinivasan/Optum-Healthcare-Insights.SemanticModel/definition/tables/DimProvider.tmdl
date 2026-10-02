@@ -1,0 +1,67 @@
+table DimProvider
+	lineageTag: 89c18847-f83d-48e4-a0c4-0934dbb58575
+
+	column ProviderKey
+		dataType: int64
+		isHidden
+		lineageTag: 22a6741b-d7cc-4b6d-b7fc-d38b44d51f68
+		summarizeBy: none
+		sourceColumn: ProviderKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProviderID
+		dataType: string
+		lineageTag: fa7d0b95-b8f6-431d-ad54-ce14b2a3c4d5
+		summarizeBy: none
+		sourceColumn: ProviderID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProviderName
+		dataType: string
+		lineageTag: 89bf53bb-7acd-40cf-9c7d-c58860aaded8
+		summarizeBy: none
+		sourceColumn: ProviderName
+
+		annotation SummarizationSetBy = Automatic
+
+	column Specialty
+		dataType: string
+		lineageTag: 09f413f5-cd3d-469e-b65e-ba10c40e841b
+		summarizeBy: none
+		sourceColumn: Specialty
+
+		annotation SummarizationSetBy = Automatic
+
+	column NetworkStatus
+		dataType: string
+		lineageTag: f9f80d5c-4ffc-4fe3-922e-9c16813f3b9a
+		summarizeBy: none
+		sourceColumn: NetworkStatus
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Provider Hierarchy'
+		lineageTag: 8099c87d-7fd3-423e-b8a8-49554105b347
+
+		level Specialty
+			lineageTag: edcb8afb-52cc-4852-88c3-82e0e4049bc3
+			column: Specialty
+
+		level Provider
+			lineageTag: 15707fcb-042c-466b-b3fd-44555ed9203f
+			column: ProviderName
+
+	partition DimProvider = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\\malik\\power bi traning\\powerbi-accelerator\\cog-to-bi-asgnmt\\day-6\\data\\DimProvider.csv"),[Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"ProviderKey", Int64.Type}, {"ProviderID", type text}, {"ProviderName", type text}, {"Specialty", type text}, {"NetworkStatus", type text}}, "en-US")
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

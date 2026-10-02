@@ -1,0 +1,140 @@
+table FactSales
+	lineageTag: a2e23ca0-a3b7-4d29-b40c-8c3ac460cf3c
+
+	measure 'Sales CY' = CALCULATE(SUM(FactSales[SalesAmount]), DimDate[Year] = MAX(DimDate[Year]))
+		formatString: $#,0.00
+		lineageTag: bad270b8-4c74-41ef-80da-766fbb55c4bc
+
+	measure 'Sales LY' = CALCULATE(SUM(FactSales[SalesAmount]), DimDate[Year] = MAX(DimDate[Year]) - 1)
+		formatString: $#,0.00
+		lineageTag: 84d1d3e9-6d09-492f-9f2c-9dd40ec0bd01
+
+	measure 'Profit CY' = CALCULATE(SUM(FactSales[ProfitAmount]), DimDate[Year] = MAX(DimDate[Year]))
+		formatString: $#,0.00
+		lineageTag: 9ce6dceb-a175-4df2-a75b-e60ab8df20bb
+
+	measure 'Profit LY' = CALCULATE(SUM(FactSales[ProfitAmount]), DimDate[Year] = MAX(DimDate[Year]) - 1)
+		formatString: $#,0.00
+		lineageTag: 4c94aa75-7e21-4831-b790-a5d08b26764f
+
+	measure 'Cost CY' = CALCULATE(SUM(FactSales[CostAmount]), DimDate[Year] = MAX(DimDate[Year]))
+		formatString: $#,0.00
+		lineageTag: 5c14fde6-1c2a-4932-add1-c8a6758e034d
+
+	measure 'Cost LY' = CALCULATE(SUM(FactSales[CostAmount]), DimDate[Year] = MAX(DimDate[Year]) - 1)
+		formatString: $#,0.00
+		lineageTag: b30c29e2-1927-48bb-a09a-1a9e63171431
+
+	measure 'Margin CY' = IFERROR(DIVIDE([Profit CY], [Sales CY]), 0)
+		formatString: 0.0%
+		lineageTag: 4c78c3f6-a728-4beb-822c-787f91c49a60
+
+	measure 'Margin LY' = IFERROR(DIVIDE([Profit LY], [Sales LY]), 0)
+		formatString: 0.0%
+		lineageTag: 7f39fd7f-d4f3-49e1-a36d-742f29342913
+
+	measure 'Sales YoY' = IFERROR(DIVIDE([Sales CY] - [Sales LY], [Sales LY]), 0)
+		formatString: +0.00%;-0.00%
+		lineageTag: c2327855-6781-4638-ab48-6ca0b2081013
+
+	measure 'Profit YoY' = IFERROR(DIVIDE([Profit CY] - [Profit LY], [Profit LY]), 0)
+		formatString: +0.00%;-0.00%
+		lineageTag: 6f8d941f-0b49-4928-8784-d9ae8815531b
+
+	measure 'Margin YoY pts' = IFERROR(([Margin CY] - [Margin LY]) * 100, 0)
+		formatString: +0.0" pts";-0.0" pts"
+		lineageTag: ec986bf2-e4ab-4f76-b4c2-bd55e0f29d90
+
+	column SalesID
+		dataType: string
+		lineageTag: c66a0c57-37f5-4150-b368-0208afab6087
+		summarizeBy: none
+		sourceColumn: SalesID
+
+		annotation SummarizationSetBy = Automatic
+
+	column DateKey
+		dataType: string
+		lineageTag: 81729556-b7fd-46ee-bcca-02d9bdf01a58
+		summarizeBy: none
+		sourceColumn: DateKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomerKey
+		dataType: string
+		lineageTag: 189eab1a-de75-48aa-921a-348ba7ff2d18
+		summarizeBy: none
+		sourceColumn: CustomerKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: string
+		lineageTag: 189eab1a-de75-48aa-921a-348ba7ff2d19
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column SalespersonKey
+		dataType: string
+		lineageTag: 189eab1a-de75-48aa-921a-348ba7ff2d1a
+		summarizeBy: none
+		sourceColumn: SalespersonKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column RegionKey
+		dataType: string
+		lineageTag: 189eab1a-de75-48aa-921a-348ba7ff2d1b
+		summarizeBy: none
+		sourceColumn: RegionKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quantity
+		dataType: int64
+		lineageTag: aaa3f7cb-9deb-4bcf-9ccb-5bf2bf708fd3
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column SalesAmount
+		dataType: double
+		formatString: $#,0.00
+		lineageTag: 77dec49e-18d9-4805-898f-82226288edad
+		summarizeBy: sum
+		sourceColumn: SalesAmount
+
+		annotation SummarizationSetBy = Automatic
+
+	column CostAmount
+		dataType: double
+		formatString: $#,0.00
+		lineageTag: 5fbe5307-7e52-430e-b39e-59f107f0b31a
+		summarizeBy: sum
+		sourceColumn: CostAmount
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProfitAmount
+		dataType: double
+		formatString: $#,0.00
+		lineageTag: 30a6caad-4e89-427f-a487-962fa1b5045a
+		summarizeBy: sum
+		sourceColumn: ProfitAmount
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Partition1 = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents("C:\\malik\\power bi traning\\powerbi-accelerator\\cog-to-bi-asgnmt\\data\\FactSales.csv"),[Delimiter=",", Columns=10, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				  #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				  #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"SalesID", type text}, {"DateKey", type text}, {"CustomerKey", type text}, {"ProductKey", type text}, {"SalespersonKey", type text}, {"RegionKey", type text}, {"Quantity", Int64.Type}, {"SalesAmount", type number}, {"CostAmount", type number}, {"ProfitAmount", type number}})
+				in
+				  #"Changed Type"
+

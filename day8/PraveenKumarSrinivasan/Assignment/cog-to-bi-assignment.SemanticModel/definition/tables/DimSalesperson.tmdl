@@ -1,0 +1,37 @@
+table DimSalesperson
+	lineageTag: f7i68gf5-fcj2-8i8e-gb6i-ei9j8c9hm34h
+
+	column SalespersonKey
+		dataType: string
+		lineageTag: g88d3ga3-gik3-9j9f-ic7j-fj9k9d9in45i
+		summarizeBy: none
+		sourceColumn: SalespersonKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Salesperson
+		dataType: string
+		lineageTag: h99e4hb4-hjl4-ak0g-jd8k-gk0l0eao56j
+		summarizeBy: none
+		sourceColumn: Salesperson
+
+		annotation SummarizationSetBy = Automatic
+
+	column RegionKey
+		dataType: string
+		lineageTag: i00f5ic5-ikm5-bl1h-ke9l-hl1m1fbp67k
+		summarizeBy: none
+		sourceColumn: RegionKey
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Partition1 = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents("C:\\malik\\power bi traning\\powerbi-accelerator\\cog-to-bi-asgnmt\\data\\DimSalesperson.csv"),[Delimiter=",", Columns=3, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				  #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				  #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"SalespersonKey", type text}, {"Salesperson", type text}, {"RegionKey", type text}})
+				in
+				  #"Changed Type"
+

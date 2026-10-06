@@ -1,0 +1,33 @@
+{
+  "name": "Optum Theme",
+  "dataColors": ["#E87722", "#636363", "#C25608", "#959595", "#F2A66B", "#3F3F3F", "#B3B3B3", "#FBE3D0"],
+  "background": "#FFFFFF",
+  "foreground": "#333333",
+  "tableAccent": "#E87722",
+  "good": "#2E7D5B",
+  "neutral": "#959595",
+  "bad": "#B3261E",
+  "maximum": "#C25608",
+  "center": "#F2A66B",
+  "minimum": "#FBE3D0",
+  "textClasses": {
+    "title": { "fontFace": "Segoe UI Semibold", "fontSize": 14, "color": "#C25608" },
+    "label": { "fontFace": "Segoe UI", "fontSize": 10, "color": "#444444" },
+    "callout": { "fontFace": "Segoe UI Semibold", "fontSize": 28, "color": "#C25608" },
+    "header": { "fontFace": "Segoe UI Semibold", "fontSize": 12, "color": "#333333" }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "title": [{ "show": true, "fontColor": { "solid": { "color": "#C25608" } } }],
+        "border": [{ "show": true, "color": { "solid": { "color": "#E0E0E0" } }, "radius": 4 }],
+        "background": [{ "show": true, "color": { "solid": { "color": "#FFFFFF" } } }]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [{ "color": { "solid": { "color": "#F5F5F5" } }, "transparency": 0 }]
+      }
+    }
+  }
+}

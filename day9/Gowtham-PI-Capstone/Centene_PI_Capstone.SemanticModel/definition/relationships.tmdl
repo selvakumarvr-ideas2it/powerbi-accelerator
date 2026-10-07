@@ -1,0 +1,40 @@
+relationship f13bface-8ca2-4abc-8b90-e0124aa5a091
+	fromColumn: fact_pi_measures.client_key
+	toColumn: dim_client.client_key
+
+relationship 342fde61-a9d2-4b8a-8e0f-a8a2ee880e83
+	fromColumn: fact_pi_measures.lob_key
+	toColumn: dim_line_of_business.lob_key
+
+relationship ae5ecb42-da1f-4a06-b4cc-47e90efdf3d6
+	fromColumn: fact_pi_measures.funding_type_key
+	toColumn: dim_funding_type.funding_type_key
+
+relationship 3acf8743-7326-443d-8ab3-5659d7e16a99
+	fromColumn: fact_pi_measures.pi_service_key
+	toColumn: dim_pi_service.pi_service_key
+
+relationship c5fd1ffd-37d4-44d8-ab5c-27adf083abff
+	fromColumn: fact_pi_measures.claim_type_key
+	toColumn: dim_claim_type.claim_type_key
+
+relationship 640a3513-2938-4187-a1f4-4d4624d06aaa
+	fromColumn: fact_pi_measures.analytic_key
+	toColumn: dim_analytic.analytic_key
+
+relationship 6f37b56c-5750-47a7-9c16-c5d870f784da
+	fromColumn: fact_pi_measures.provider_key
+	toColumn: dim_provider.provider_key
+
+relationship 8a6b5590-f435-42a5-92f8-d185f2da4757
+	fromColumn: fact_pi_measures.employer_group_key
+	toColumn: dim_employer_group.employer_group_key
+
+relationship f90ece13-c625-43fc-8477-77f5f66269d7
+	fromColumn: fact_pi_measures.source_system_key
+	toColumn: dim_source_system.source_system_key
+
+relationship c38d9b22-8d8d-48b9-adb7-ef7ae5ae5762
+	fromColumn: fact_pi_measures.period_date
+	toColumn: dim_date.full_date
+

@@ -1,0 +1,67 @@
+/// PI analytics (SCD2 - Analytic7 v1 retired 2023-11-30 and replaced by v2).
+table dim_analytic
+	lineageTag: f0017f6f-ffbb-40bb-9746-e8e59d094a0f
+
+	column analytic_key
+		dataType: int64
+		isHidden
+		lineageTag: 419089bc-37dc-40db-9ac5-6cd8b94f32ce
+		summarizeBy: none
+		sourceColumn: analytic_key
+
+	column analytic_code
+		dataType: string
+		lineageTag: b38ee865-0c73-489b-8de7-4d32e2c82cb9
+		summarizeBy: none
+		sourceColumn: analytic_code
+
+	column analytic_name
+		dataType: string
+		lineageTag: 8acb7a23-9505-4b2f-b0d6-dc0070d45c24
+		summarizeBy: none
+		sourceColumn: analytic_name
+
+	column analytic_desc
+		dataType: string
+		lineageTag: c8bb50a4-b7bc-4052-8049-1f9ab54c7bba
+		summarizeBy: none
+		sourceColumn: analytic_desc
+
+	column analytic_label
+		dataType: string
+		lineageTag: 97f51f3e-5731-44b5-aed8-9b58e57a4788
+		summarizeBy: none
+		sourceColumn: analytic_label
+
+	column home_service_code
+		dataType: string
+		lineageTag: 037649e8-47f7-43fd-8c38-e6838e5757af
+		summarizeBy: none
+		sourceColumn: home_service_code
+
+	column is_active
+		dataType: boolean
+		lineageTag: b74dbbe8-b6ee-4f05-b683-debfd0801ac2
+		summarizeBy: none
+		sourceColumn: is_active
+
+	column status
+		dataType: string
+		lineageTag: ff5cd366-1161-460a-90e2-c0f92f4c5977
+		summarizeBy: none
+		sourceColumn: status
+
+	partition dim_analytic = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "dim_analytic.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Selected = Table.SelectColumns(Promoted, {"analytic_key", "analytic_code", "analytic_name", "analytic_desc", "pi_service_code", "is_active", "status"}),
+				    NullFixed = Table.ReplaceValue(Selected, "null", null, Replacer.ReplaceValue, Table.ColumnNames(Selected)),
+				    Typed = Table.TransformColumnTypes(NullFixed, {{"analytic_key", Int64.Type}, {"analytic_code", type text}, {"analytic_name", type text}, {"analytic_desc", type text}, {"pi_service_code", type text}, {"is_active", type logical}, {"status", type text}}, "en-US"),
+				    Renamed = Table.RenameColumns(Typed, {{"pi_service_code", "home_service_code"}}),
+				    AddLabel = Table.AddColumn(Renamed, "analytic_label", each [analytic_desc] & " (" & [analytic_name] & ")", type text)
+				in
+				    AddLabel
+

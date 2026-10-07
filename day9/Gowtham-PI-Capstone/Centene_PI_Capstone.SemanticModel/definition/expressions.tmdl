@@ -1,0 +1,6 @@
+/// Folder that holds the Centene PI CSV extracts (must end with a backslash)
+expression DataFolder = "C:\Users\azureuser\Documents\powerbi-accelerator\day9\centene-data\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 41b82dd8-e24d-4ab9-9735-783d42686ebc
+
+	annotation PBI_ResultType = Text
+

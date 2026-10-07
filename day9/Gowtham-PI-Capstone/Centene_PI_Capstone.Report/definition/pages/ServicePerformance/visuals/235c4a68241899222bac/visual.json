@@ -1,0 +1,90 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "235c4a68241899222bac",
+  "position": {
+    "x": 8,
+    "y": 640,
+    "z": 3400,
+    "height": 70,
+    "width": 196,
+    "tabOrder": 3400
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "TIP",
+                    "textStyle": {
+                      "fontFamily": "Roboto, 'Segoe UI', sans-serif",
+                      "fontSize": "7.5pt",
+                      "color": "#DFF7F7",
+                      "fontWeight": "bold"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Expand + to drill Timing > Service > Analytic",
+                    "textStyle": {
+                      "fontFamily": "Roboto, 'Segoe UI', sans-serif",
+                      "fontSize": "8pt",
+                      "color": "#FFFFFF"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Source: Centene PI extract · 248 rows",
+                    "textStyle": {
+                      "fontFamily": "Roboto, 'Segoe UI', sans-serif",
+                      "fontSize": "7.5pt",
+                      "color": "#E5F5FF"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

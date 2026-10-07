@@ -1,0 +1,41 @@
+/// ASO (self-funded) vs Fully Insured.
+table dim_funding_type
+	lineageTag: 42ba1937-479c-4b47-b3ec-690a21d5f0ff
+
+	column funding_type_key
+		dataType: int64
+		isHidden
+		lineageTag: 71c48a25-28d1-4b86-ad04-b98269fdd463
+		summarizeBy: none
+		sourceColumn: funding_type_key
+
+	column funding_type_code
+		dataType: string
+		lineageTag: 9fa3bb1b-2128-42a6-b79f-ba0d6a79becd
+		summarizeBy: none
+		sourceColumn: funding_type_code
+
+	column funding_type_name
+		dataType: string
+		lineageTag: 7b21226e-1a85-4473-8c56-a8bb2f46b3e4
+		summarizeBy: none
+		sourceColumn: funding_type_name
+
+	column funding_type_desc
+		dataType: string
+		lineageTag: 31243613-0687-4bba-bca8-2e929542aab8
+		summarizeBy: none
+		sourceColumn: funding_type_desc
+
+	partition dim_funding_type = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "dim_funding_type.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Selected = Table.SelectColumns(Promoted, {"funding_type_key", "funding_type_code", "funding_type_name", "funding_type_desc"}),
+				    NullFixed = Table.ReplaceValue(Selected, "null", null, Replacer.ReplaceValue, Table.ColumnNames(Selected)),
+				    Typed = Table.TransformColumnTypes(NullFixed, {{"funding_type_key", Int64.Type}, {"funding_type_code", type text}, {"funding_type_name", type text}, {"funding_type_desc", type text}}, "en-US")
+				in
+				    Typed
+

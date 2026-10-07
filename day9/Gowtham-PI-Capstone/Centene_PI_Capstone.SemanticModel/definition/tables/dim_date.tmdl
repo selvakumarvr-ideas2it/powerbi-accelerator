@@ -1,0 +1,84 @@
+/// Calendar, filtered to the fact range Jan-2023 to Dec-2025. Marked as the model date table.
+table dim_date
+	lineageTag: f94039ed-15dc-48e0-a443-170147f9a607
+	dataCategory: Time
+
+	column full_date
+		dataType: dateTime
+		isKey
+		formatString: dd-mmm-yyyy
+		lineageTag: b598360e-0cba-4e15-ba0d-e7be5ac959b7
+		summarizeBy: none
+		sourceColumn: full_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: 75d3a736-526a-4f20-b5fd-81abfdc4bb96
+		summarizeBy: none
+		sourceColumn: year
+
+	column quarter
+		dataType: int64
+		isHidden
+		lineageTag: fe231cab-4da2-4c0d-8187-3fde5168a20d
+		summarizeBy: none
+		sourceColumn: quarter
+
+	column quarter_name
+		dataType: string
+		lineageTag: e573041e-252e-4ff7-83b8-3b0e74bf3a57
+		summarizeBy: none
+		sourceColumn: quarter_name
+
+	column month
+		dataType: int64
+		isHidden
+		lineageTag: c5e07d52-3596-463a-82fd-2e9afa361a94
+		summarizeBy: none
+		sourceColumn: month
+
+	column month_name
+		dataType: string
+		lineageTag: 593ce4e9-dba4-4dc4-83ea-4037744f24aa
+		summarizeBy: none
+		sourceColumn: month_name
+		sortByColumn: month
+
+	column month_short
+		dataType: string
+		lineageTag: 082320e3-c341-4820-8568-07ccfee7c071
+		summarizeBy: none
+		sourceColumn: month_short
+		sortByColumn: month
+
+	column year_month
+		dataType: string
+		lineageTag: 5e361b2d-f3a0-4287-85bc-c9b544e59ee5
+		summarizeBy: none
+		sourceColumn: year_month
+
+	column year_quarter
+		dataType: string
+		lineageTag: 8e7b7aba-3f1c-48c4-8680-f876e74901d2
+		summarizeBy: none
+		sourceColumn: year_quarter
+
+	partition dim_date = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "dim_date.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Selected = Table.SelectColumns(Promoted, {"full_date", "year", "quarter", "quarter_name", "month", "month_name"}),
+				    NullFixed = Table.ReplaceValue(Selected, "null", null, Replacer.ReplaceValue, Table.ColumnNames(Selected)),
+				    Typed = Table.TransformColumnTypes(NullFixed, {{"full_date", type date}, {"year", Int64.Type}, {"quarter", Int64.Type}, {"quarter_name", type text}, {"month", Int64.Type}, {"month_name", type text}}, "en-US"),
+				    InRange = Table.SelectRows(Typed, each [full_date] >= #date(2023, 1, 1) and [full_date] <= #date(2025, 12, 31)),
+				    AddShort = Table.AddColumn(InRange, "month_short", each Text.Start([month_name], 3), type text),
+				    AddYM = Table.AddColumn(AddShort, "year_month", each Text.From([year]) & "-" & Text.PadStart(Text.From([month]), 2, "0"), type text),
+				    AddYQ = Table.AddColumn(AddYM, "year_quarter", each Text.From([year]) & " " & [quarter_name], type text)
+				in
+				    AddYQ
+

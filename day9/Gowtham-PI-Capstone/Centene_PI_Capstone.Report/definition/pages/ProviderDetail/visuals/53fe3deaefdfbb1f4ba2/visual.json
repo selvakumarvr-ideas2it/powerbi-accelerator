@@ -1,0 +1,77 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "53fe3deaefdfbb1f4ba2",
+  "position": {
+    "x": 228,
+    "y": 4,
+    "z": 6500,
+    "height": 48,
+    "width": 560,
+    "tabOrder": 6500
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Provider Detail",
+                    "textStyle": {
+                      "fontFamily": "'Roboto Slab', Georgia, serif",
+                      "fontSize": "16pt",
+                      "color": "#00598C"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Savings, accuracy and claim lines for one provider",
+                    "textStyle": {
+                      "fontFamily": "Roboto, 'Segoe UI', sans-serif",
+                      "fontSize": "8.5pt",
+                      "color": "#58595B"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

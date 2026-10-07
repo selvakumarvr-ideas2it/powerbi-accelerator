@@ -1,0 +1,41 @@
+/// Source system that produced the measure row.
+table dim_source_system
+	lineageTag: 9dfc048a-cf98-4b24-9d58-74669b315072
+
+	column source_system_key
+		dataType: int64
+		isHidden
+		lineageTag: 230ffaac-aa55-4a84-8f88-ca8620776262
+		summarizeBy: none
+		sourceColumn: source_system_key
+
+	column source_system_code
+		dataType: string
+		lineageTag: b35529fe-4caa-4f39-8835-2af6e82edca8
+		summarizeBy: none
+		sourceColumn: source_system_code
+
+	column source_system_name
+		dataType: string
+		lineageTag: 56e51d79-e19f-40b9-965d-3dd71c4ca7e3
+		summarizeBy: none
+		sourceColumn: source_system_name
+
+	column source_system_category
+		dataType: string
+		lineageTag: 110ab649-9b70-4dd0-8635-41a7c5e9ccc0
+		summarizeBy: none
+		sourceColumn: source_system_category
+
+	partition dim_source_system = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "dim_source_system.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Selected = Table.SelectColumns(Promoted, {"source_system_key", "source_system_code", "source_system_name", "source_system_category"}),
+				    NullFixed = Table.ReplaceValue(Selected, "null", null, Replacer.ReplaceValue, Table.ColumnNames(Selected)),
+				    Typed = Table.TransformColumnTypes(NullFixed, {{"source_system_key", Int64.Type}, {"source_system_code", type text}, {"source_system_name", type text}, {"source_system_category", type text}}, "en-US")
+				in
+				    Typed
+

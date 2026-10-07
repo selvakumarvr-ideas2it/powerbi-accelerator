@@ -1,0 +1,79 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "838dd593d607b2b6307d",
+  "position": {
+    "x": 8,
+    "y": 8,
+    "z": 2900,
+    "height": 56,
+    "width": 196,
+    "tabOrder": 2900
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "CENTENE",
+                    "textStyle": {
+                      "fontFamily": "Roboto, 'Segoe UI', sans-serif",
+                      "fontSize": "18pt",
+                      "color": "#FFFFFF",
+                      "fontWeight": "bold"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "PAYMENT INTEGRITY ANALYTICS",
+                    "textStyle": {
+                      "fontFamily": "Roboto, 'Segoe UI', sans-serif",
+                      "fontSize": "7.5pt",
+                      "color": "#DFF7F7",
+                      "fontWeight": "bold"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

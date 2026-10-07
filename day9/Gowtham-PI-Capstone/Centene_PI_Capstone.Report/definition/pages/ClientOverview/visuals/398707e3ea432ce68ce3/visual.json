@@ -1,0 +1,90 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "398707e3ea432ce68ce3",
+  "position": {
+    "x": 228,
+    "y": 4,
+    "z": 1000,
+    "height": 48,
+    "width": 560,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Client Overview",
+                    "textStyle": {
+                      "fontFamily": "'Roboto Slab', Georgia, serif",
+                      "fontSize": "16pt",
+                      "color": "#00598C"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "How is each client performing - by funding type, line of business and employer group?",
+                    "textStyle": {
+                      "fontFamily": "Roboto, 'Segoe UI', sans-serif",
+                      "fontSize": "8.5pt",
+                      "color": "#58595B"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'''Roboto Slab'', Georgia, serif'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

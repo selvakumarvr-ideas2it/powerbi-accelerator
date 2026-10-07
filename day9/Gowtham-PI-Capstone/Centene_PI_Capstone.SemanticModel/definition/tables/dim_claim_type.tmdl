@@ -1,0 +1,41 @@
+/// Professional, Institutional IP/OP, Pharmacy.
+table dim_claim_type
+	lineageTag: cdf23564-b3c4-4baf-a3e1-3285d1e81a75
+
+	column claim_type_key
+		dataType: int64
+		isHidden
+		lineageTag: 866099dd-6ee8-452b-a29f-8328c989f058
+		summarizeBy: none
+		sourceColumn: claim_type_key
+
+	column claim_type_code
+		dataType: string
+		lineageTag: ba76aae5-d090-4e6a-a018-735a22542af7
+		summarizeBy: none
+		sourceColumn: claim_type_code
+
+	column claim_type_name
+		dataType: string
+		lineageTag: b2edad20-b1b5-4605-a3b9-9e5cbd52e864
+		summarizeBy: none
+		sourceColumn: claim_type_name
+
+	column claim_type_desc
+		dataType: string
+		lineageTag: 894d9371-de3e-4fd4-9d82-94bd719887c5
+		summarizeBy: none
+		sourceColumn: claim_type_desc
+
+	partition dim_claim_type = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "dim_claim_type.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Selected = Table.SelectColumns(Promoted, {"claim_type_key", "claim_type_code", "claim_type_name", "claim_type_desc"}),
+				    NullFixed = Table.ReplaceValue(Selected, "null", null, Replacer.ReplaceValue, Table.ColumnNames(Selected)),
+				    Typed = Table.TransformColumnTypes(NullFixed, {{"claim_type_key", Int64.Type}, {"claim_type_code", type text}, {"claim_type_name", type text}, {"claim_type_desc", type text}}, "en-US")
+				in
+				    Typed
+

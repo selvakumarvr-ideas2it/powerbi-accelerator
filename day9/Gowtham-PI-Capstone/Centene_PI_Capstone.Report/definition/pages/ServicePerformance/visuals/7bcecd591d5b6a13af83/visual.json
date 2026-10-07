@@ -1,0 +1,77 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "7bcecd591d5b6a13af83",
+  "position": {
+    "x": 228,
+    "y": 4,
+    "z": 3700,
+    "height": 48,
+    "width": 560,
+    "tabOrder": 3700
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Service & Analytic Performance",
+                    "textStyle": {
+                      "fontFamily": "'Roboto Slab', Georgia, serif",
+                      "fontSize": "16pt",
+                      "color": "#00598C"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Which PI services and analytics deliver savings, and how accurate are they?",
+                    "textStyle": {
+                      "fontFamily": "Roboto, 'Segoe UI', sans-serif",
+                      "fontSize": "8.5pt",
+                      "color": "#58595B"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

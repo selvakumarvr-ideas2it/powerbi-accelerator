@@ -1,0 +1,30 @@
+expression DataFolder = "C:\Users\charan.lingeswaran\Music\PowerBI Visualization\powerbi-accelerator\day9\Charan\Day9_Capstone_Project\Data" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: a1e7f346-76cc-428d-97ee-dc79ead09b38
+
+	annotation PBI_ResultType = Text
+
+expression CenteneProxyClientKey = 1 meta [IsParameterQuery=true, Type="Number", IsParameterQueryRequired=true]
+	lineageTag: 040f9544-556b-43de-b7a7-9b7bcfca5c64
+
+	annotation PBI_ResultType = Number
+
+/// Loads the CSV in DataFolder whose header contains the given signature column. Robust to file names (two source files are mislabelled).
+expression fnLoadBySignature =
+		(signature as text) as table =>
+		let
+		    CsvOptions = [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv],
+		    Files = Folder.Files(DataFolder),
+		    Csvs = Table.SelectRows(Files, each Text.Lower([Extension]) = ".csv" and not Text.StartsWith([Name], "~")),
+		    WithHeaders = Table.AddColumn(Csvs, "Headers", each List.Transform(Table.ColumnNames(Table.PromoteHeaders(Table.FirstN(Csv.Document([Content], CsvOptions), 1), [PromoteAllScalars = true])), Text.Trim)),
+		    Match = Table.SelectRows(WithHeaders, each List.Contains([Headers], signature)),
+		    Raw = Table.PromoteHeaders(Csv.Document(Match{0}[Content], CsvOptions), [PromoteAllScalars = true]),
+		    Trimmed = Table.TransformColumnNames(Raw, Text.Trim),
+		    NoNullText = Table.ReplaceValue(Trimmed, "null", null, Replacer.ReplaceValue, Table.ColumnNames(Trimmed)),
+		    NoEmpty = Table.ReplaceValue(NoNullText, "", null, Replacer.ReplaceValue, Table.ColumnNames(NoNullText)),
+		    Result = if Table.IsEmpty(Match) then error Error.Record("Missing data file", "No CSV in " & DataFolder & " has a column named " & signature) else NoEmpty
+		in
+		    Result
+	lineageTag: 571b8bdb-93b6-422f-9a1c-b07202be83e9
+
+	annotation PBI_ResultType = Function
+

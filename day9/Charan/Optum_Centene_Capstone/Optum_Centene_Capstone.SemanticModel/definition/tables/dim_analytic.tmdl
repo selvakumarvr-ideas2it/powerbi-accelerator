@@ -1,0 +1,96 @@
+/// PI analytics (detection rules). Use analytic_desc as the business-facing label.
+table dim_analytic
+	lineageTag: 4d7cd00e-3d34-4745-9492-15abc3fc1a32
+
+	column analytic_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 4d72fbf9-5fef-49e0-9dd9-89b761e9d227
+		summarizeBy: none
+		sourceColumn: analytic_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column analytic_code
+		dataType: string
+		lineageTag: e7e23bc1-3752-4537-aeb4-1f4abbd561cf
+		summarizeBy: none
+		sourceColumn: analytic_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column analytic_name
+		dataType: string
+		lineageTag: cceb938c-21a0-43b7-b4d9-73909d6e976b
+		summarizeBy: none
+		sourceColumn: analytic_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column analytic_desc
+		dataType: string
+		lineageTag: 329a769d-2ba4-47f2-b22a-196d91e93329
+		summarizeBy: none
+		sourceColumn: analytic_desc
+
+		annotation SummarizationSetBy = Automatic
+
+	column pi_service_code
+		dataType: string
+		lineageTag: 1f84c61e-f2d9-47ec-9e71-63d6bac5f461
+		summarizeBy: none
+		sourceColumn: pi_service_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column analytic_go_live_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: c891758d-2ee3-4a33-bc4a-b4c3d9dcfcbe
+		summarizeBy: none
+		sourceColumn: analytic_go_live_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column analytic_retire_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: effa8505-075b-4148-a72e-5485ae8bdad2
+		summarizeBy: none
+		sourceColumn: analytic_retire_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column is_active
+		dataType: boolean
+		lineageTag: b7992203-29c3-4264-99f3-9de0e4b36f1f
+		summarizeBy: none
+		sourceColumn: is_active
+
+		annotation SummarizationSetBy = Automatic
+
+	column status
+		dataType: string
+		lineageTag: 72e6a109-6a48-4077-96f4-3de5707e2bd1
+		summarizeBy: none
+		sourceColumn: status
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_analytic = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadBySignature("analytic_code"),
+				    Selected = Table.SelectColumns(Source, {"analytic_key", "analytic_code", "analytic_name", "analytic_desc", "pi_service_code", "analytic_go_live_date", "analytic_retire_date", "is_active", "status"}, MissingField.UseNull),
+				    Typed = Table.TransformColumnTypes(Selected, {{"analytic_key", Int64.Type}, {"analytic_code", type text}, {"analytic_name", type text}, {"analytic_desc", type text}, {"pi_service_code", type text}, {"analytic_go_live_date", type date}, {"analytic_retire_date", type date}, {"is_active", type logical}, {"status", type text}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

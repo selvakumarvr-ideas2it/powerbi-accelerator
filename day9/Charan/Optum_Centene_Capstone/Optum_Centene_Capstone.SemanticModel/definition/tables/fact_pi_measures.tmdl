@@ -1,0 +1,261 @@
+/// Monthly PI measures. Grain: month x client x LOB x funding x service x claim type x analytic x provider x employer group x source. The three *_claims_*_amount columns hold claim COUNTS (assumption, values ~10k vs billed $M). true_positive_rate_pct is a ratio: never SUM/AVERAGE, use [Weighted TPR %].
+table fact_pi_measures
+	lineageTag: 1fdbb3e8-02d0-4bb1-9ce4-f51f71e60093
+
+	column pi_measures_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 10b79e24-77a5-4c9b-a104-b8614aad79f6
+		summarizeBy: none
+		sourceColumn: pi_measures_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column client_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 15779552-5d5c-417d-8a55-c5e3d374f98f
+		summarizeBy: none
+		sourceColumn: client_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column lob_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 58ac2d38-db49-4c6f-a5ec-92eb60857c4f
+		summarizeBy: none
+		sourceColumn: lob_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column funding_type_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: f938dae2-1710-484b-8e6e-0f899c822bff
+		summarizeBy: none
+		sourceColumn: funding_type_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column pi_service_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: a70e3994-9a96-486b-ad06-c9455168a9a4
+		summarizeBy: none
+		sourceColumn: pi_service_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column claim_type_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 81fd3824-da81-4fd7-b713-e39ddbc26a3f
+		summarizeBy: none
+		sourceColumn: claim_type_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column analytic_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 01aab68e-9d52-4ef2-9560-5a6f50e06f13
+		summarizeBy: none
+		sourceColumn: analytic_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column provider_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9a4c197b-3ab2-4f52-b69a-d1072024c585
+		summarizeBy: none
+		sourceColumn: provider_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column employer_group_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0cead820-b9ac-4352-95ea-619de3fff7ed
+		summarizeBy: none
+		sourceColumn: employer_group_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column source_system_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: beac8a80-901f-420e-b06e-ced557cca591
+		summarizeBy: none
+		sourceColumn: source_system_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: fcada903-db49-459c-8f7f-17aca83b5d01
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_claims_submitted_amount
+		dataType: double
+		formatString: 0.00
+		lineageTag: e9bf034b-45f2-45f6-bb18-68a3bb5b9f85
+		summarizeBy: sum
+		sourceColumn: total_claims_submitted_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_claims_pre_edit_allowed_amount
+		dataType: double
+		formatString: 0.00
+		lineageTag: 9a75f911-c9e0-48ea-931d-4b1934a09f74
+		summarizeBy: sum
+		sourceColumn: total_claims_pre_edit_allowed_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_claims_processed_amount
+		dataType: double
+		formatString: 0.00
+		lineageTag: 287c0d89-a5f3-4445-84d2-a984170a8794
+		summarizeBy: sum
+		sourceColumn: total_claims_processed_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_billed_amount
+		dataType: decimal
+		formatString: \$#,0.00
+		lineageTag: e9b6df63-0473-44de-861e-43579ba9ca5c
+		summarizeBy: sum
+		sourceColumn: total_billed_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_paid_amount
+		dataType: decimal
+		formatString: \$#,0.00
+		lineageTag: d8f0530c-8dfc-4ca6-94aa-cf930b14c527
+		summarizeBy: sum
+		sourceColumn: total_paid_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column pre_pay_savings_amount
+		dataType: decimal
+		formatString: \$#,0.00
+		lineageTag: 6f6bb51f-a7ee-4c03-b507-d93a8f7c1f04
+		summarizeBy: sum
+		sourceColumn: pre_pay_savings_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column post_pay_savings_amount
+		dataType: decimal
+		formatString: \$#,0.00
+		lineageTag: d5c152ae-10ba-4aa9-a253-b7c2d1601b00
+		summarizeBy: sum
+		sourceColumn: post_pay_savings_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_savings_amount
+		dataType: decimal
+		formatString: \$#,0.00
+		lineageTag: 698e64b0-8f30-4f34-abc6-1323d6588f9e
+		summarizeBy: sum
+		sourceColumn: total_savings_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column true_positive_rate_pct
+		dataType: double
+		formatString: 0.00
+		lineageTag: e0bf16f3-dffd-4051-b7e0-775a65bed04e
+		summarizeBy: sum
+		sourceColumn: true_positive_rate_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	/// DERIVED (prototype rule; source has no claim status). Priority: 1 Returned = edit reject rate >= P90; 2 Suspended = backlog rate >= P90 AND records-based service (Chart Review, Itemized Bill, DRG, Readmission); 3 Pending = backlog rate >= P90 (other services); 4 Approved = true positive rate < P25 (flags mostly overturned); 5 Paid = no prepay & no postpay savings; 6 Denied = prepay >= postpay; 7 Adjusted = otherwise. Voided has no signal in the data.
+	column claim_status_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 07689b2a-28d7-4c84-8891-ed056a3eb6ff
+		summarizeBy: none
+		sourceColumn: claim_status_key
+
+		changedProperty = IsHidden
+
+	partition fact_pi_measures = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadBySignature("pi_measures_key"),
+				    Selected = Table.SelectColumns(Source, {"pi_measures_key", "client_key", "lob_key", "funding_type_key", "pi_service_key", "claim_type_key", "analytic_key", "provider_key", "employer_group_key", "source_system_key", "date_key", "total_claims_submitted_amount", "total_claims_pre_edit_allowed_amount", "total_claims_processed_amount", "total_billed_amount", "total_paid_amount", "pre_pay_savings_amount", "post_pay_savings_amount", "total_savings_amount", "true_positive_rate_pct"}, MissingField.UseNull),
+				    Typed = Table.TransformColumnTypes(Selected, {{"pi_measures_key", Int64.Type}, {"client_key", Int64.Type}, {"lob_key", Int64.Type}, {"funding_type_key", Int64.Type}, {"pi_service_key", Int64.Type}, {"claim_type_key", Int64.Type}, {"analytic_key", Int64.Type}, {"provider_key", Int64.Type}, {"employer_group_key", Int64.Type}, {"source_system_key", Int64.Type}, {"date_key", Int64.Type}, {"total_claims_submitted_amount", type number}, {"total_claims_pre_edit_allowed_amount", type number}, {"total_claims_processed_amount", type number}, {"total_billed_amount", Currency.Type}, {"total_paid_amount", Currency.Type}, {"pre_pay_savings_amount", Currency.Type}, {"post_pay_savings_amount", Currency.Type}, {"total_savings_amount", Currency.Type}, {"true_positive_rate_pct", type number}}, "en-US"),
+				
+				    // Employer group: null keys AND keys not found in dim_employer_group -> -1 (Unassigned)
+				    ValidEGKeys = List.Buffer(List.Transform(Table.Column(fnLoadBySignature("employer_group_code"), "employer_group_key"), Number.From)),
+				    FixedEG = Table.TransformColumns(Typed, {{"employer_group_key", each if _ = null or not List.Contains(ValidEGKeys, _) then -1 else _, Int64.Type}}),
+				
+				    // ---- Derived claim status (prototype rule; source fact has no claim_status_key) ----
+				    // Priority: 1 Returned  -> edit reject rate in top 10% (>= P90)
+				    //           2 Suspended -> backlog rate in top 10% (>= P90) AND records-based PI service
+				    //           3 Pending   -> backlog rate in top 10% (>= P90), any other service
+				    //           4 Approved  -> true positive rate in bottom 25% (< P25): most flags overturned, claims approved
+				    //           5 Paid      -> no prepay and no postpay savings
+				    //           6 Denied    -> prepay savings >= postpay savings
+				    //           7 Adjusted  -> otherwise (savings mostly recovered after payment)
+				    WithRates = Table.AddColumn(Table.AddColumn(FixedEG,
+				        "_reject", each if [total_claims_submitted_amount] = null or [total_claims_submitted_amount] = 0 then 0 else ([total_claims_submitted_amount] - [total_claims_pre_edit_allowed_amount]) / [total_claims_submitted_amount], type number),
+				        "_backlog", each if [total_claims_pre_edit_allowed_amount] = null or [total_claims_pre_edit_allowed_amount] = 0 then 0 else ([total_claims_pre_edit_allowed_amount] - [total_claims_processed_amount]) / [total_claims_pre_edit_allowed_amount], type number),
+				    RejectP90 = List.Percentile(WithRates[_reject], 0.9, [PercentileMode = PercentileMode.ExcelInc]),
+				    BacklogP90 = List.Percentile(WithRates[_backlog], 0.9, [PercentileMode = PercentileMode.ExcelInc]),
+				    TprP25 = List.Percentile(List.RemoveNulls(WithRates[true_positive_rate_pct]), 0.25, [PercentileMode = PercentileMode.ExcelInc]),
+				    Services = Table.TransformColumnTypes(Table.SelectColumns(fnLoadBySignature("pi_service_timing"), {"pi_service_key", "pi_service_name"}), {{"pi_service_key", Int64.Type}}),
+				    RecordsServiceKeys = List.Buffer(Table.SelectRows(Services, each List.Contains({"Clinical Chart Review", "Itemized Bill Review", "DRG Validation", "Readmission Review"}, [pi_service_name]))[pi_service_key]),
+				    StatusTable = Table.TransformColumnTypes(Table.SelectColumns(fnLoadBySignature("claim_status_code"), {"claim_status_key", "claim_status_code"}), {{"claim_status_key", Int64.Type}}),
+				    KeyFor = (code as text) => let r = Table.SelectRows(StatusTable, each [claim_status_code] = code) in if Table.IsEmpty(r) then null else r{0}[claim_status_key],
+				    RetnKey = KeyFor("RETN"),
+				    SuspKey = KeyFor("SUSP"),
+				    PendKey = KeyFor("PEND"),
+				    ApprKey = KeyFor("APPR"),
+				    PaidKey = KeyFor("PAID"),
+				    DenyKey = KeyFor("DENY"),
+				    AdjKey = KeyFor("ADJ"),
+				    WithStatus = Table.AddColumn(WithRates, "claim_status_key", each
+				        let
+				            pre = if [pre_pay_savings_amount] = null then 0 else [pre_pay_savings_amount],
+				            post = if [post_pay_savings_amount] = null then 0 else [post_pay_savings_amount],
+				            tpr = [true_positive_rate_pct]
+				        in
+				            if [_reject] >= RejectP90 then RetnKey
+				            else if [_backlog] >= BacklogP90 and List.Contains(RecordsServiceKeys, [pi_service_key]) then SuspKey
+				            else if [_backlog] >= BacklogP90 then PendKey
+				            else if tpr <> null and tpr < TprP25 then ApprKey
+				            else if pre = 0 and post = 0 then PaidKey
+				            else if pre >= post then DenyKey
+				            else AdjKey, Int64.Type),
+				    Result = Table.RemoveColumns(WithStatus, {"_reject", "_backlog"})
+				in
+				    Result
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,57 @@
+table dim_source_system
+	lineageTag: 1473445d-a761-4001-967d-c0d1fd3316c8
+
+	column source_system_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: a05bb66d-794f-4dd6-aeef-f48a919d315c
+		summarizeBy: none
+		sourceColumn: source_system_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column source_system_code
+		dataType: string
+		lineageTag: 2b8caf99-e8cf-4279-a487-358765aff895
+		summarizeBy: none
+		sourceColumn: source_system_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column source_system_name
+		dataType: string
+		lineageTag: b25d3777-6594-4f96-ab99-f7e14a1d6ec6
+		summarizeBy: none
+		sourceColumn: source_system_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column source_system_category
+		dataType: string
+		lineageTag: 359f272b-c540-420a-944b-4ea2a00358f9
+		summarizeBy: none
+		sourceColumn: source_system_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column source_system_desc
+		dataType: string
+		lineageTag: b97cca26-9d66-4d61-8e3c-bdf3e33e0d84
+		summarizeBy: none
+		sourceColumn: source_system_desc
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_source_system = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadBySignature("source_system_code"),
+				    Selected = Table.SelectColumns(Source, {"source_system_key", "source_system_code", "source_system_name", "source_system_category", "source_system_desc"}, MissingField.UseNull),
+				    Typed = Table.TransformColumnTypes(Selected, {{"source_system_key", Int64.Type}, {"source_system_code", type text}, {"source_system_name", type text}, {"source_system_category", type text}, {"source_system_desc", type text}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

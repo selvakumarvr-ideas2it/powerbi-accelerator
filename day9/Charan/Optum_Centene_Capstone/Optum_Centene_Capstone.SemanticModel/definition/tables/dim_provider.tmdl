@@ -1,0 +1,96 @@
+table dim_provider
+	lineageTag: 40136b03-6897-4cf0-a112-6fe49f0ad856
+
+	column provider_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 8eb037c2-852c-4b48-a9b4-ec05cfff5ae5
+		summarizeBy: none
+		sourceColumn: provider_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column provider_tin
+		dataType: string
+		lineageTag: 3ddd0b10-8e8f-4b33-8c52-30d543cb0769
+		summarizeBy: none
+		sourceColumn: provider_tin
+
+		annotation SummarizationSetBy = Automatic
+
+	column provider_npi
+		dataType: string
+		lineageTag: 6a2bbfb7-d4d7-4955-9728-87e239ce6728
+		summarizeBy: none
+		sourceColumn: provider_npi
+
+		annotation SummarizationSetBy = Automatic
+
+	column provider_name
+		dataType: string
+		lineageTag: 1208b787-79f4-4c6b-9ffd-5f5712f064b4
+		summarizeBy: none
+		sourceColumn: provider_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column provider_type
+		dataType: string
+		lineageTag: f96a95ee-42df-4a46-81d7-1ef405ad54f5
+		summarizeBy: none
+		sourceColumn: provider_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column provider_state
+		dataType: string
+		lineageTag: d0eb091b-d2d7-4aad-9342-8168e57f7c74
+		dataCategory: StateOrProvince
+		summarizeBy: none
+		sourceColumn: provider_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column effective_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 7259d78e-cf0b-4349-b092-283c520514e7
+		summarizeBy: none
+		sourceColumn: effective_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column expiration_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 58159b3a-cf6f-4860-895d-5e1e7fb6f93a
+		summarizeBy: none
+		sourceColumn: expiration_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column is_current
+		dataType: boolean
+		lineageTag: 3a2d3f08-abc2-4e1f-b947-6d97cb50f171
+		summarizeBy: none
+		sourceColumn: is_current
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_provider = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadBySignature("provider_npi"),
+				    Selected = Table.SelectColumns(Source, {"provider_key", "provider_tin", "provider_npi", "provider_name", "provider_type", "provider_state", "effective_date", "expiration_date", "is_current"}, MissingField.UseNull),
+				    Typed = Table.TransformColumnTypes(Selected, {{"provider_key", Int64.Type}, {"provider_tin", type text}, {"provider_npi", type text}, {"provider_name", type text}, {"provider_type", type text}, {"provider_state", type text}, {"effective_date", type date}, {"expiration_date", type date}, {"is_current", type logical}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

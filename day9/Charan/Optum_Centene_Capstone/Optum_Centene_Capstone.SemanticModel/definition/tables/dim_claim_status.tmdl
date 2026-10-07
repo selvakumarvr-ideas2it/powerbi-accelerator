@@ -1,0 +1,65 @@
+/// Claim status lookup. NOTE: fact_pi_measures has no claim_status_key, so this table is disconnected.
+table dim_claim_status
+	lineageTag: cc3ca077-f650-4670-8c46-15809f5ac1ee
+
+	column claim_status_key
+		dataType: int64
+		formatString: 0
+		lineageTag: fe795021-597a-4b3a-b24b-388e96959fe6
+		summarizeBy: none
+		sourceColumn: claim_status_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column claim_status_code
+		dataType: string
+		lineageTag: 80f31387-6c39-46b9-9fe1-1f0489c08bac
+		summarizeBy: none
+		sourceColumn: claim_status_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column claim_status_name
+		dataType: string
+		lineageTag: a90a06d2-35b2-43b5-8737-bf8cc6c6d318
+		summarizeBy: none
+		sourceColumn: claim_status_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column claim_status_desc
+		dataType: string
+		lineageTag: ac98e972-a5a3-4c03-915a-95b685a2747b
+		summarizeBy: none
+		sourceColumn: claim_status_desc
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_terminal
+		dataType: boolean
+		lineageTag: 6a917eb2-bc20-4f9a-91c1-1545f501985c
+		summarizeBy: none
+		sourceColumn: is_terminal
+
+		annotation SummarizationSetBy = Automatic
+
+	column requires_action
+		dataType: boolean
+		lineageTag: 7b535610-e6bc-497a-ad33-a38b55ac8e51
+		summarizeBy: none
+		sourceColumn: requires_action
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_claim_status = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadBySignature("claim_status_code"),
+				    Selected = Table.SelectColumns(Source, {"claim_status_key", "claim_status_code", "claim_status_name", "claim_status_desc", "is_terminal", "requires_action"}, MissingField.UseNull),
+				    Typed = Table.TransformColumnTypes(Selected, {{"claim_status_key", Int64.Type}, {"claim_status_code", type text}, {"claim_status_name", type text}, {"claim_status_desc", type text}, {"is_terminal", type logical}, {"requires_action", type logical}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

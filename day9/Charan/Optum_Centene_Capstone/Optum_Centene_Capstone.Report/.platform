@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Optum_Centene_Capstone"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "7ba23c67-857a-44c7-a5a0-03c3132ec3a4"
+  }
+}

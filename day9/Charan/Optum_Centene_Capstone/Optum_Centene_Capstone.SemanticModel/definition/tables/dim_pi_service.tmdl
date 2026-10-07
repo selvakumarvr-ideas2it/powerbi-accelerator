@@ -1,0 +1,58 @@
+/// PI services (COB, Subrogation, FWA...). Source file names for PI service and employer group are swapped; loader finds each by its columns.
+table dim_pi_service
+	lineageTag: effeadce-1d04-4e55-b9eb-4133daa2ea48
+
+	column pi_service_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2e49bf2a-217e-4d3e-937e-5ef6a0d0d1e8
+		summarizeBy: none
+		sourceColumn: pi_service_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column pi_service_code
+		dataType: string
+		lineageTag: 9c682989-a4d2-42b6-970c-dd07702a7f85
+		summarizeBy: none
+		sourceColumn: pi_service_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column pi_service_name
+		dataType: string
+		lineageTag: 26a278b6-964d-4e2e-9f74-42cfa5cb60e1
+		summarizeBy: none
+		sourceColumn: pi_service_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column pi_service_timing
+		dataType: string
+		lineageTag: 5fbd84b2-9ca6-4f0a-991b-24e68a04222b
+		summarizeBy: none
+		sourceColumn: pi_service_timing
+
+		annotation SummarizationSetBy = Automatic
+
+	column pi_service_desc
+		dataType: string
+		lineageTag: 61bd82e6-60f7-4324-88b7-4f74b1a78d66
+		summarizeBy: none
+		sourceColumn: pi_service_desc
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_pi_service = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadBySignature("pi_service_timing"),
+				    Selected = Table.SelectColumns(Source, {"pi_service_key", "pi_service_code", "pi_service_name", "pi_service_timing", "pi_service_desc"}, MissingField.UseNull),
+				    Typed = Table.TransformColumnTypes(Selected, {{"pi_service_key", Int64.Type}, {"pi_service_code", type text}, {"pi_service_name", type text}, {"pi_service_timing", type text}, {"pi_service_desc", type text}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

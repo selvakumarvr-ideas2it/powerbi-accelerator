@@ -1,0 +1,31 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["DataFolder","CenteneProxyClientKey","fnLoadBySignature","_Measures","fact_pi_measures","dim_date","dim_client","dim_line_of_business","dim_funding_type","dim_pi_service","dim_analytic","dim_claim_type","dim_provider","dim_employer_group","dim_source_system","dim_claim_status"]
+
+annotation PBI_ProTooling = ["DevMode","MCP-PBIModeling"]
+
+ref table _Measures
+ref table fact_pi_measures
+ref table dim_date
+ref table dim_client
+ref table dim_line_of_business
+ref table dim_funding_type
+ref table dim_pi_service
+ref table dim_analytic
+ref table dim_claim_type
+ref table dim_provider
+ref table dim_employer_group
+ref table dim_source_system
+ref table dim_claim_status
+ref table 'Display Options'
+ref table 'Claim Funnel Stage'
+

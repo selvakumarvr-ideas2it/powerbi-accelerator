@@ -1,0 +1,99 @@
+/// Clients. PROTOTYPE ASSUMPTION: source data has no Centene row; the client whose key equals parameter CenteneProxyClientKey is presented as Centene Corporation (client_name keeps the original).
+table dim_client
+	lineageTag: 14fe1dc0-e072-494f-8666-3242d2a87b9c
+
+	column client_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e7f2a372-4bee-4326-91a6-e73769ed4867
+		summarizeBy: none
+		sourceColumn: client_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column client_code
+		dataType: string
+		lineageTag: 9c99a2b9-2c7c-4511-bcfd-8adb4c5ae33b
+		summarizeBy: none
+		sourceColumn: client_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column client_name
+		dataType: string
+		lineageTag: d22a41fa-b31c-4c33-b17b-44e3fd3cf969
+		summarizeBy: none
+		sourceColumn: client_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column client_category
+		dataType: string
+		lineageTag: ef7732a5-7a06-47ab-ad14-e3ef79c5fbba
+		summarizeBy: none
+		sourceColumn: client_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column effective_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 2485a34b-2e38-4037-a46b-433543b7dfda
+		summarizeBy: none
+		sourceColumn: effective_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column expiration_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: b611c0e8-b714-450a-9f8e-085e6d419f50
+		summarizeBy: none
+		sourceColumn: expiration_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column is_current
+		dataType: boolean
+		lineageTag: af566720-b411-427a-8d33-fc79517d591c
+		summarizeBy: none
+		sourceColumn: is_current
+
+		annotation SummarizationSetBy = Automatic
+
+	column client_display_name
+		dataType: string
+		lineageTag: 238b22c0-7240-455e-9ca5-24570c181fcb
+		summarizeBy: none
+		sourceColumn: client_display_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_centene_view
+		dataType: boolean
+		lineageTag: 1199ae4d-9e0e-42a1-9c1a-0ec81e324a94
+		summarizeBy: none
+		sourceColumn: is_centene_view
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_client = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadBySignature("client_code"),
+				    Selected = Table.SelectColumns(Source, {"client_key", "client_code", "client_name", "client_category", "effective_date", "expiration_date", "is_current"}, MissingField.UseNull),
+				    Typed = Table.TransformColumnTypes(Selected, {{"client_key", Int64.Type}, {"client_code", type text}, {"client_name", type text}, {"client_category", type text}, {"effective_date", type date}, {"expiration_date", type date}, {"is_current", type logical}}, "en-US"),
+				    // The whole dataset is Centene's; dim_client lists Centene's own client plans. No proxy mapping.
+				    WithDisplay = Table.AddColumn(Typed, "client_display_name", each [client_name], type text),
+				    WithFlag = Table.AddColumn(WithDisplay, "is_centene_view", each true, type logical)
+				in
+				    WithFlag
+
+	annotation PBI_ResultType = Table
+

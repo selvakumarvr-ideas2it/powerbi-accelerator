@@ -1,0 +1,248 @@
+/// Home table for all measures. Folders: 1 Savings, 2 Financials, 3 Volume, 4 Quality, 5 Fee Scenario (assumption), 9 Validation.
+table _Measures
+	lineageTag: d3faf9bc-cd8a-4d18-b0e5-468122fcbd0a
+
+	/// Prepay + postpay savings.
+	measure 'Total Savings' = SUM ( fact_pi_measures[total_savings_amount] )
+		formatString: \$#,0
+		displayFolder: 1 Savings
+		lineageTag: c5972640-3e09-4e60-942b-d2479412406c
+
+	/// Overpayments prevented before payment.
+	measure 'Prepay Savings' = SUM ( fact_pi_measures[pre_pay_savings_amount] )
+		formatString: \$#,0
+		displayFolder: 1 Savings
+		lineageTag: 9fe76436-28d0-420c-8f5f-4198346f6524
+
+	/// Overpayments recovered after payment (pay-and-chase).
+	measure 'Postpay Savings' = SUM ( fact_pi_measures[post_pay_savings_amount] )
+		formatString: \$#,0
+		displayFolder: 1 Savings
+		lineageTag: 1c41c496-b4e4-4a07-96c0-0a50131e67d5
+
+	/// Share of savings caught before payment. Higher is better.
+	measure 'Prepay Share %' = DIVIDE ( [Prepay Savings], [Prepay Savings] + [Postpay Savings] )
+		formatString: 0.0%
+		displayFolder: 1 Savings
+		lineageTag: de431f76-4cc3-455f-847d-d0c10de4ce88
+
+	/// Same period last year. REMOVEFILTERS used because the date relationship is on an integer key.
+	measure 'Savings PY' = CALCULATE ( [Total Savings], REMOVEFILTERS ( dim_date ), SAMEPERIODLASTYEAR ( dim_date[full_date] ) )
+		formatString: \$#,0
+		displayFolder: 1 Savings
+		lineageTag: eb4c95d8-fa18-40e1-b078-0c4e1715e005
+
+	/// Latest selected year vs the prior year. Multi-year selections compare the latest selected year with the year before it (e.g. all years = 2025 vs 2024). Blank when no prior year exists.
+	measure 'Savings YoY %' =
+			VAR LatestYear =
+			    MAXX ( FILTER ( VALUES ( dim_date[year] ), NOT ISBLANK ( [Total Savings] ) ), dim_date[year] )
+			VAR CurrentSavings =
+			    CALCULATE ( [Total Savings], KEEPFILTERS ( dim_date[year] = LatestYear ) )
+			VAR PriorSavings =
+			    CALCULATE ( [Savings PY], KEEPFILTERS ( dim_date[year] = LatestYear ) )
+			RETURN
+			    IF ( NOT ISBLANK ( PriorSavings ), DIVIDE ( CurrentSavings - PriorSavings, PriorSavings ) )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 1 Savings
+		lineageTag: bd5e8e65-d6ba-45b2-91cc-4a389f07f6dc
+
+	/// Savings as a percentage of paid claims.
+	measure 'Savings Yield %' = DIVIDE ( [Total Savings], [Total Paid] )
+		formatString: 0.00%
+		displayFolder: 1 Savings
+		lineageTag: 59b8e199-6c69-4b33-be9c-22a0ed4091cd
+
+	/// Amount billed by providers.
+	measure 'Total Billed' = SUM ( fact_pi_measures[total_billed_amount] )
+		formatString: \$#,0
+		displayFolder: 2 Financials
+		lineageTag: 76b3e181-05d9-4ea4-b910-2084b1babe38
+
+	/// Amount paid on claims.
+	measure 'Total Paid' = SUM ( fact_pi_measures[total_paid_amount] )
+		formatString: \$#,0
+		displayFolder: 2 Financials
+		lineageTag: 4be5fc1c-7e36-4044-812d-04395d4d90ee
+
+	/// Paid as a share of billed.
+	measure 'Paid to Billed %' = DIVIDE ( [Total Paid], [Total Billed] )
+		formatString: 0.0%
+		displayFolder: 2 Financials
+		lineageTag: 14d085bb-8069-4c9c-8001-e8b2158b0c96
+
+	/// Claim count submitted (assumed count).
+	measure 'Claims Submitted' = SUM ( fact_pi_measures[total_claims_submitted_amount] )
+		formatString: #,0
+		displayFolder: 3 Volume
+		lineageTag: 7d4ab2a6-0b90-405f-9ae8-4c548a9c57e3
+
+	/// Claims allowed through pre-edits (assumed count).
+	measure 'Claims Passed Edits' = SUM ( fact_pi_measures[total_claims_pre_edit_allowed_amount] )
+		formatString: #,0
+		displayFolder: 3 Volume
+		lineageTag: 5854df1a-2650-4877-a98c-bf0d468e6d45
+
+	/// Claims processed (assumed count).
+	measure 'Claims Processed' = SUM ( fact_pi_measures[total_claims_processed_amount] )
+		formatString: #,0
+		displayFolder: 3 Volume
+		lineageTag: a06f0d62-a9ce-4ba9-b9f9-de65a24e80a1
+
+	/// Share of submitted claims passing edits.
+	measure 'Edit Pass Rate %' = DIVIDE ( [Claims Passed Edits], [Claims Submitted] )
+		formatString: 0.0%
+		displayFolder: 3 Volume
+		lineageTag: 22fbc839-ef06-4c8d-933d-db940186850d
+
+	/// Share of submitted claims processed.
+	measure 'Processing Rate %' = DIVIDE ( [Claims Processed], [Claims Submitted] )
+		formatString: 0.0%
+		displayFolder: 3 Volume
+		lineageTag: 454a7a14-361a-4c1a-b40c-b8a4dd0b25f4
+
+	/// True positive rate weighted by claims processed. Never average the raw column.
+	measure 'Weighted TPR %' =
+			VAR Num =
+			    SUMX ( fact_pi_measures, fact_pi_measures[true_positive_rate_pct] * fact_pi_measures[total_claims_processed_amount] )
+			VAR Den =
+			    SUMX ( FILTER ( fact_pi_measures, NOT ISBLANK ( fact_pi_measures[true_positive_rate_pct] ) ), fact_pi_measures[total_claims_processed_amount] )
+			RETURN
+			    DIVIDE ( Num, Den ) / 100
+		formatString: 0.0%
+		displayFolder: 4 Quality
+		lineageTag: c9edf65c-bec3-4e70-aeb9-2d53dff8902b
+
+	/// Share of flags that were not valid findings: provider abrasion indicator.
+	measure 'False Positive Rate %' = VAR Tpr = [Weighted TPR %] RETURN IF ( NOT ISBLANK ( Tpr ), 1 - Tpr )
+		formatString: 0.0%
+		displayFolder: 4 Quality
+		lineageTag: 77b11938-a8ed-4b53-80e2-608dd952519f
+
+	/// Row count for reconciliation.
+	measure 'Fact Rows' = COUNTROWS ( fact_pi_measures )
+		formatString: #,0
+		displayFolder: 9 Validation
+		lineageTag: 6eb63ee7-f6d5-4528-a83e-d07e9deec143
+
+	/// Must be 0: total = prepay + postpay.
+	measure 'Savings Reconciliation Gap' = SUMX ( fact_pi_measures, ROUND ( fact_pi_measures[total_savings_amount] - fact_pi_measures[pre_pay_savings_amount] - fact_pi_measures[post_pay_savings_amount], 2 ) ) + 0
+		formatString: \$#,0.00
+		displayFolder: 9 Validation
+		lineageTag: ed11b879-a20f-4e2c-8faf-1b2be50266c9
+
+	/// Must be 0: fact date_key not found in dim_date.
+	measure 'Rows Missing Date' = COUNTROWS ( FILTER ( fact_pi_measures, ISBLANK ( RELATED ( dim_date[full_date] ) ) ) ) + 0
+		formatString: #,0
+		displayFolder: 9 Validation
+		lineageTag: 972c0d0a-d01f-4ddf-b807-708cfffaabcb
+
+	/// Orphan client keys.
+	measure 'Rows Missing Client' = COUNTROWS ( FILTER ( fact_pi_measures, ISBLANK ( RELATED ( dim_client[client_code] ) ) ) ) + 0
+		formatString: #,0
+		displayFolder: 9 Validation
+		lineageTag: dddd4170-31f3-427d-be81-ed1fcbf0440e
+
+	/// Orphan analytic keys.
+	measure 'Rows Missing Analytic' = COUNTROWS ( FILTER ( fact_pi_measures, ISBLANK ( RELATED ( dim_analytic[analytic_code] ) ) ) ) + 0
+		formatString: #,0
+		displayFolder: 9 Validation
+		lineageTag: 2d105365-d8f4-4249-86b6-9a458c567c50
+
+	/// Orphan provider keys.
+	measure 'Rows Missing Provider' = COUNTROWS ( FILTER ( fact_pi_measures, ISBLANK ( RELATED ( dim_provider[provider_npi] ) ) ) ) + 0
+		formatString: #,0
+		displayFolder: 9 Validation
+		lineageTag: 72c08d05-e87f-482e-898d-2d98c772d3fb
+
+	/// Orphan PI service keys.
+	measure 'Rows Missing PI Service' = COUNTROWS ( FILTER ( fact_pi_measures, ISBLANK ( RELATED ( dim_pi_service[pi_service_code] ) ) ) ) + 0
+		formatString: #,0
+		displayFolder: 9 Validation
+		lineageTag: acdbb1c8-161e-4480-81bf-c16f1f43d618
+
+	/// Must be 0: processed can't exceed submitted.
+	measure 'Rows Funnel Out Of Order' = COUNTROWS ( FILTER ( fact_pi_measures, fact_pi_measures[total_claims_processed_amount] > fact_pi_measures[total_claims_submitted_amount] ) ) + 0
+		formatString: #,0
+		displayFolder: 9 Validation
+		lineageTag: 10701159-8d51-4002-a03f-235dbb964d14
+
+	/// Dynamic title for the Analytic Detail drill-through page: selected analytic and its savings.
+	measure 'Analytic Detail Title' =
+			VAR _name = SELECTEDVALUE ( dim_analytic[analytic_desc], "Multiple analytics" )
+			VAR _sav = [Total Savings]
+			VAR _savTxt = IF ( ISBLANK ( _sav ), "no savings", FORMAT ( _sav / 1e6, "$#,0.0" ) & "M saved" )
+			RETURN
+			    "Analytic detail · " & _name & " · " & _savTxt
+		displayFolder: 8 Dynamic Titles
+		lineageTag: f15a8d53-5f1f-4352-bd31-e27b080f3fa7
+
+	/// Dynamic title for the Provider Detail drill-through page: selected provider, state and savings.
+	measure 'Provider Detail Title' =
+			VAR _name = SELECTEDVALUE ( dim_provider[provider_name], "Multiple providers" )
+			VAR _state = SELECTEDVALUE ( dim_provider[provider_state] )
+			VAR _sav = [Total Savings]
+			VAR _savTxt = IF ( ISBLANK ( _sav ), "no savings", FORMAT ( _sav / 1e6, "$#,0.0" ) & "M identified" )
+			RETURN
+			    "Provider detail · " & _name & IF ( NOT ISBLANK ( _state ), " (" & _state & ")" ) & " · " & _savTxt
+		displayFolder: 8 Dynamic Titles
+		lineageTag: de2a24c2-5fef-44e8-822a-fde3845911d0
+
+	/// Dynamic chart title for the monthly trend on the Analytic Detail page.
+	measure 'Analytic Trend Title' = "Monthly savings and accuracy · " & SELECTEDVALUE ( dim_analytic[analytic_desc], "selected analytics" )
+		displayFolder: 8 Dynamic Titles
+		lineageTag: 6afe2682-36c9-4c26-bc81-9ec99c3e64c5
+
+	/// Dynamic chart title for the monthly trend on the Provider Detail page.
+	measure 'Provider Trend Title' = "Monthly savings vs last year · " & SELECTEDVALUE ( dim_provider[provider_name], "selected providers" )
+		displayFolder: 8 Dynamic Titles
+		lineageTag: 7c579e97-c843-47ab-9c38-d489f017c7e9
+
+	/// Must be 0: fact rows whose derived claim_status_key has no match in dim_claim_status.
+	measure 'Rows Missing Claim Status' = COUNTROWS ( FILTER ( fact_pi_measures, ISBLANK ( RELATED ( dim_claim_status[claim_status_code] ) ) ) ) + 0
+		formatString: #,0
+		displayFolder: 9 Validation
+		lineageTag: ac7e998e-63a3-43b4-8ed1-bdeab4caddb6
+
+	/// Must be 0: fact rows whose employer_group_key has no match in dim_employer_group (orphans are mapped to -1 Unassigned in Power Query).
+	measure 'Rows Missing Employer Group' = COUNTROWS ( FILTER ( fact_pi_measures, ISBLANK ( RELATED ( dim_employer_group[employer_group_code] ) ) ) ) + 0
+		formatString: #,0
+		displayFolder: 9 Validation
+		lineageTag: 90cf1c07-97f1-4e7a-8316-595b8e1dd795
+
+	/// Claim count at the selected funnel stage: Submitted -> Passed front-end edits -> Processed. Responds to all slicers through the fact table.
+	measure 'Claims at Stage' =
+			SWITCH (
+			    SELECTEDVALUE ( 'Claim Funnel Stage'[Stage Order] ),
+			    1, [Claims Submitted],
+			    2, [Claims Passed Edits],
+			    3, [Claims Processed]
+			)
+		formatString: #,0
+		displayFolder: 3 Volume
+		lineageTag: 0aee5024-68c1-402f-a0e6-8a85c18cbffb
+
+	/// Claims at this funnel stage as a share of claims submitted.
+	measure 'Funnel % of Submitted' = DIVIDE ( [Claims at Stage], [Claims Submitted] )
+		formatString: 0.0%
+		displayFolder: 3 Volume
+		lineageTag: 32847a20-9dab-403c-abac-ab337f9a75f4
+
+	column Placeholder
+		dataType: string
+		isHidden
+		lineageTag: bf1367a3-772f-4308-8b28-3cc28c203261
+		summarizeBy: none
+		sourceColumn: Placeholder
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Placeholder = text], {})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table
+

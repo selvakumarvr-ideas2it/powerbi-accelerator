@@ -1,0 +1,49 @@
+table dim_funding_type
+	lineageTag: 8433d4e2-f1dc-4f31-ae82-b6729d1d98a0
+
+	column funding_type_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 601194d2-e10e-4bd5-a2ae-3adeb22fdf83
+		summarizeBy: none
+		sourceColumn: funding_type_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column funding_type_code
+		dataType: string
+		lineageTag: fff9a476-94d2-4b38-8e26-dd488c2b7884
+		summarizeBy: none
+		sourceColumn: funding_type_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column funding_type_name
+		dataType: string
+		lineageTag: bdcd8515-0c9c-4056-9e38-13469f37bf99
+		summarizeBy: none
+		sourceColumn: funding_type_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column funding_type_desc
+		dataType: string
+		lineageTag: 264d153c-7e73-4bbf-9af7-8f8cc965d534
+		summarizeBy: none
+		sourceColumn: funding_type_desc
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_funding_type = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadBySignature("funding_type_code"),
+				    Selected = Table.SelectColumns(Source, {"funding_type_key", "funding_type_code", "funding_type_name", "funding_type_desc"}, MissingField.UseNull),
+				    Typed = Table.TransformColumnTypes(Selected, {{"funding_type_key", Int64.Type}, {"funding_type_code", type text}, {"funding_type_name", type text}, {"funding_type_desc", type text}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

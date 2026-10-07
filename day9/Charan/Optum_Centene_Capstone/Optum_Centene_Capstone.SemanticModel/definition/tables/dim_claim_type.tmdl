@@ -1,0 +1,49 @@
+table dim_claim_type
+	lineageTag: eee95a09-24ae-457a-a1df-5f4ebc32eea7
+
+	column claim_type_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: b2f4c408-c5eb-40f5-9e5d-cb6c181c5e6d
+		summarizeBy: none
+		sourceColumn: claim_type_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column claim_type_code
+		dataType: string
+		lineageTag: 338f9822-6025-4b19-a97b-5f7f0f70abe5
+		summarizeBy: none
+		sourceColumn: claim_type_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column claim_type_name
+		dataType: string
+		lineageTag: 45f6aedf-663d-4af0-b1ae-5931b9c9858b
+		summarizeBy: none
+		sourceColumn: claim_type_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column claim_type_desc
+		dataType: string
+		lineageTag: ce74bec7-469c-43c9-9c42-b3f7d5831098
+		summarizeBy: none
+		sourceColumn: claim_type_desc
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_claim_type = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadBySignature("claim_type_code"),
+				    Selected = Table.SelectColumns(Source, {"claim_type_key", "claim_type_code", "claim_type_name", "claim_type_desc"}, MissingField.UseNull),
+				    Typed = Table.TransformColumnTypes(Selected, {{"claim_type_key", Int64.Type}, {"claim_type_code", type text}, {"claim_type_name", type text}, {"claim_type_desc", type text}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

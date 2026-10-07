@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Optum_Centene_Capstone"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "70ebbf54-76ff-4c16-b4dc-9d3f31656fd3"
+  }
+}

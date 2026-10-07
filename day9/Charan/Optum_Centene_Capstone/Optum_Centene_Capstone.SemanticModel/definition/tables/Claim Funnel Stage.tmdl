@@ -1,0 +1,21 @@
+/// Disconnected stage list for the claim funnel chart. Used with measure [Claims at Stage].
+table 'Claim Funnel Stage'
+	lineageTag: 2a5a2dbf-e302-4eee-93f8-d98610d4cae4
+
+	column Stage
+		lineageTag: 31579de6-cb6b-4c80-89d4-e5187e6de9ca
+		isNameInferred
+		sourceColumn: [Stage]
+		sortByColumn: 'Stage Order'
+
+	column 'Stage Order'
+		isHidden
+		lineageTag: 344e3de9-fda2-4f62-b18e-1debc284a99c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Stage Order]
+
+	partition 'Claim Funnel Stage' = calculated
+		mode: import
+		source = DATATABLE ( "Stage", STRING, "Stage Order", INTEGER, { { "Submitted", 1 }, { "Passed front-end edits", 2 }, { "Processed (adjudicated)", 3 } } )
+

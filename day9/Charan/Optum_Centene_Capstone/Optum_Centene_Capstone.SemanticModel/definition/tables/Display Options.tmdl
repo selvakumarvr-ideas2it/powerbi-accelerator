@@ -1,0 +1,47 @@
+table 'Display Options'
+	lineageTag: 8b0b5abd-8a7e-4b55-97c6-ec7f4f967672
+
+	/// Display options. Apply the item 'Blank as No Data Available' as a report-level filter so empty KPI cards read 'No Data Available'.
+	calculationGroup
+		precedence: 10
+
+		/// On KPI cards only (no category in scope), a blank result shows the text 'No Data Available' instead of (Blank). Charts and tables are unaffected.
+		calculationItem 'Blank as No Data Available' =
+				VAR _value = SELECTEDMEASURE ()
+				VAR _isCardContext =
+				    NOT (
+				        ISINSCOPE ( dim_date[month_start] ) || ISINSCOPE ( dim_date[year] ) || ISINSCOPE ( dim_date[quarter_name] )
+				            || ISINSCOPE ( dim_date[month_name] ) || ISINSCOPE ( dim_date[year_month] )
+				            || ISINSCOPE ( dim_line_of_business[lob_name] ) || ISINSCOPE ( dim_funding_type[funding_type_name] )
+				            || ISINSCOPE ( dim_claim_type[claim_type_name] ) || ISINSCOPE ( dim_pi_service[pi_service_name] )
+				            || ISINSCOPE ( dim_analytic[analytic_desc] ) || ISINSCOPE ( dim_analytic[analytic_go_live_date] )
+				            || ISINSCOPE ( dim_provider[provider_name] ) || ISINSCOPE ( dim_provider[provider_type] )
+				            || ISINSCOPE ( dim_provider[provider_state] ) || ISINSCOPE ( dim_client[client_display_name] )
+				            || ISINSCOPE ( dim_client[client_category] ) || ISINSCOPE ( dim_claim_status[claim_status_name] )
+				            || ISINSCOPE ( 'Claim Funnel Stage'[Stage] )
+				    )
+				RETURN
+				    IF ( ISBLANK ( _value ) && _isCardContext, 0, _value )
+
+			formatStringDefinition =
+					VAR _isCardContext =
+					    NOT (
+					        ISINSCOPE ( dim_date[month_start] ) || ISINSCOPE ( dim_date[year] ) || ISINSCOPE ( dim_date[quarter_name] )
+					            || ISINSCOPE ( dim_date[month_name] ) || ISINSCOPE ( dim_date[year_month] )
+					            || ISINSCOPE ( dim_line_of_business[lob_name] ) || ISINSCOPE ( dim_funding_type[funding_type_name] )
+					            || ISINSCOPE ( dim_claim_type[claim_type_name] ) || ISINSCOPE ( dim_pi_service[pi_service_name] )
+					            || ISINSCOPE ( dim_analytic[analytic_desc] ) || ISINSCOPE ( dim_analytic[analytic_go_live_date] )
+					            || ISINSCOPE ( dim_provider[provider_name] ) || ISINSCOPE ( dim_provider[provider_type] )
+					            || ISINSCOPE ( dim_provider[provider_state] ) || ISINSCOPE ( dim_client[client_display_name] )
+					            || ISINSCOPE ( dim_client[client_category] ) || ISINSCOPE ( dim_claim_status[claim_status_name] )
+					            || ISINSCOPE ( 'Claim Funnel Stage'[Stage] )
+					    )
+					RETURN
+					    IF ( ISBLANK ( SELECTEDMEASURE () ) && _isCardContext, """No Data Available""", SELECTEDMEASUREFORMATSTRING () )
+
+	column 'Display Options'
+		dataType: string
+		lineageTag: 5e43131c-db48-4aba-9bd7-98c6669851b6
+
+	partition 'Partition_Display Options' = calculationGroup
+

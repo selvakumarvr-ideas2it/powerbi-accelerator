@@ -1,0 +1,21 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmarksMetadata/1.0.0/schema.json",
+  "items": [
+    {
+      "name": "80a4e56fcddca6e777e9",
+      "displayName": "LOB view toggle",
+      "children": [
+        "a6bade7fad2968c9ac81",
+        "76eddbff79feea791d14"
+      ]
+    },
+    {
+      "name": "b9f2d30167d4e7078c36",
+      "displayName": "Pipeline toggle",
+      "children": [
+        "7cd2202d881581b75583",
+        "f343fcb8f3138170fd51"
+      ]
+    }
+  ]
+}

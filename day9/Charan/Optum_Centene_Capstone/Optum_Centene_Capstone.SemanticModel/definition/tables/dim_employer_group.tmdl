@@ -1,0 +1,100 @@
+/// Employer groups. Adds key -1 'Unassigned' for fact rows with null employer_group_key.
+table dim_employer_group
+	lineageTag: f4cc9c67-cbb6-4d1c-94fa-e84c75d8fdab
+
+	column employer_group_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0c17120c-bf7f-48d0-80c0-4995963deaaa
+		summarizeBy: none
+		sourceColumn: employer_group_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column employer_group_code
+		dataType: string
+		lineageTag: 6290d448-5a33-4dcb-8083-04b734c5da5d
+		summarizeBy: none
+		sourceColumn: employer_group_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column employer_group_name
+		dataType: string
+		lineageTag: 2700f6bb-7cbf-4dc0-8193-efaa368bcb8b
+		summarizeBy: none
+		sourceColumn: employer_group_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column client_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 083db7fe-055e-453b-a95a-5fd046973d26
+		summarizeBy: none
+		sourceColumn: client_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column primary_lob_code
+		dataType: string
+		lineageTag: 50e6484b-79da-485d-997c-5fbec98bccd8
+		summarizeBy: none
+		sourceColumn: primary_lob_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column primary_funding_type_code
+		dataType: string
+		lineageTag: 44923b40-9ef8-4c80-b426-1542335a8c15
+		summarizeBy: none
+		sourceColumn: primary_funding_type_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column effective_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: b723fb6d-9bcb-4c3b-9084-cd83ccf6a61f
+		summarizeBy: none
+		sourceColumn: effective_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column expiration_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 223c47b5-40c5-497f-94b6-6629417b0984
+		summarizeBy: none
+		sourceColumn: expiration_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column is_current
+		dataType: boolean
+		lineageTag: 96b129b1-50bf-4ce5-a978-e3fd65e946d9
+		summarizeBy: none
+		sourceColumn: is_current
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_employer_group = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadBySignature("employer_group_code"),
+				    Selected = Table.SelectColumns(Source, {"employer_group_key", "employer_group_code", "employer_group_name", "client_key", "primary_lob_code", "primary_funding_type_code", "effective_date", "expiration_date", "is_current"}, MissingField.UseNull),
+				    Unassigned = Table.FromRecords({[employer_group_key = "-1", employer_group_code = "EG-UNASSIGNED", employer_group_name = "Unassigned (no employer group)", client_key = null, primary_lob_code = null, primary_funding_type_code = null, effective_date = null, expiration_date = null, is_current = "true"]}),
+				    Combined = Table.Combine({Selected, Unassigned}),
+				    Typed = Table.TransformColumnTypes(Combined, {{"employer_group_key", Int64.Type}, {"employer_group_code", type text}, {"employer_group_name", type text}, {"client_key", Int64.Type}, {"primary_lob_code", type text}, {"primary_funding_type_code", type text}, {"effective_date", type date}, {"expiration_date", type date}, {"is_current", type logical}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+
